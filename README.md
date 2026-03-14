@@ -8,7 +8,6 @@ Reusable Claude Code assets shared across projects: skills, hooks, sub-agents, a
 |-----------|------|---------|
 | Agent config | `CLAUDE.md` | Shared agent profile — drop into any project |
 | Skills plugin | `plugins/autoresearch/` | Autonomous experiment loop skills |
-| Samples | `samples/` | Reference implementations |
 
 ## CLAUDE.md — Shared Agent Profile
 
@@ -72,6 +71,3 @@ New skills must follow the conventions in `CLAUDE.md` (`# SKILLs` section). Key 
 - **Size limit**: `SKILL.md` under 500 lines — overflow into `references/` or `workflows/`
 - **No hardcoded paths**: use `{baseDir}` in scripts
 
-## Samples
-
-`samples/pi-autoserearch/` — Reference implementation of the pi-autoresearch pattern (VS Code extension-based). Useful for understanding the design decisions behind the `autoresearch` skill, which reimplements the same loop as a pure Claude Code skill without extension dependencies.
