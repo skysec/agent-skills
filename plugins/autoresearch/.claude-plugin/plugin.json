@@ -1,0 +1,6 @@
+{
+  "name": "autoresearch",
+  "version": "0.1.0",
+  "description": "Autonomous experiment loop skills for any optimization or research target. Provides session setup (autoresearch-create) and loop execution (autoresearch) with domain knowledge templates for ML training, code optimization, and security research.",
+  "author": "hecbercordova"
+}
