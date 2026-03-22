@@ -1,0 +1,231 @@
+# Security Assessment Report
+
+**Project:** {{ assessment.system.name or '—' }}
+**Repository:** {{ assessment.metadata.repository or '—' }}
+**Commit:** {{ assessment.metadata.commit or '—' }}
+**Date:** {{ assessment.metadata.date or '—' }}
+**Assessed by:** {{ assessment.metadata.assessed_by }} v{{ assessment.metadata.skill_version }}
+
+---
+
+## System Description
+
+{{ assessment.system.description or '—' }}
+
+### AI Components Detected
+
+| Component Type | Present | Details |
+|----------------|---------|---------|
+| AI Agent | {{ assessment.system.ai_components.agent.present }} | Frameworks: {{ assessment.system.ai_components.agent.frameworks | join(', ') or '—' }} |
+| MCP Server | {{ assessment.system.ai_components.mcp_server.present }} | Transport: {{ assessment.system.ai_components.mcp_server.transport or '—' }} · Tools: {{ assessment.system.ai_components.mcp_server.tools | join(', ') or '—' }} |
+| Plugin / Hook / Extension | {{ assessment.system.ai_components.plugin_hook_extension.present }} | Platform: {{ assessment.system.ai_components.plugin_hook_extension.platform or '—' }} · Components: {{ assessment.system.ai_components.plugin_hook_extension.components | join(', ') or '—' }} |
+
+---
+
+## Architecture
+
+```mermaid
+{{ assessment.architecture.diagram | trim }}
+```
+
+### Trust Boundaries
+
+| Boundary | Notes |
+|----------|-------|
+{% for tb in assessment.architecture.trust_boundaries %}
+| {{ tb.boundary or '—' }} | {{ tb.notes or '—' }} |
+{% endfor %}
+
+| Aspect | Value |
+|--------|-------|
+| Authentication | {{ assessment.architecture.authn_mechanism or '—' }} |
+| Authorization | {{ assessment.architecture.authz_mechanism or '—' }} |
+| Secrets Storage | {{ assessment.architecture.secrets_storage or '—' }} |
+
+---
+
+## Executive Summary
+
+**Overall Risk:** {{ assessment.summary.overall_risk or '—' }}
+
+{{ assessment.summary.narrative or '—' }}
+
+### Risk Counts
+
+{% set tr = assessment.summary.risk_counts.threat_register %}
+{% set vf = assessment.summary.risk_counts.vulnerability_findings %}
+| Category | Total | Critical | High | Medium | Low |
+|----------|-------|----------|------|--------|-----|
+| Threat Register | {{ tr.total }} | {{ tr.critical }} | {{ tr.high }} | {{ tr.medium }} | {{ tr.low }} |
+| Vulnerability Findings | {{ vf.total }} | {{ vf.critical }} | {{ vf.high }} | {{ vf.medium }} | {{ vf.low }} |
+{% if assessment.system.ai_components.mcp_server.present %}
+| MCP Compliance Violations | {{ assessment.summary.risk_counts.mcp_compliance_violations or 0 }} | — | — | — | — |
+{% endif %}
+
+---
+
+## Top Recommendations
+
+| Rank | ID | Finding | Location | Effort |
+|------|----|---------|----------|--------|
+{% for rec in assessment.recommendations %}
+| {{ rec.rank }} | {{ rec.id or '—' }} | {{ rec.title or '—' }} | {{ rec.location or '—' }} | {{ rec.effort or '—' }} |
+{% endfor %}
+
+{% for rec in assessment.recommendations %}
+### {{ rec.rank }}. {{ rec.id or '—' }} — {{ rec.title or '—' }}
+
+{{ rec.description or '—' }}
+
+{% endfor %}
+
+---
+
+## Phase 0 — Triage
+
+**Manifests Reviewed:** {{ assessment.phase_0_triage.manifests_reviewed | join(', ') or '—' }}
+{% if assessment.phase_0_triage.architecture_docs_found %}
+
+**Architecture Docs Found:** {{ assessment.phase_0_triage.architecture_docs_found | join(', ') }}
+{% endif %}
+
+### Entry Points
+
+| Type | Location | Description |
+|------|----------|-------------|
+{% for ep in assessment.phase_0_triage.entry_points %}
+| {{ ep.type or '—' }} | {{ ep.location or '—' }} | {{ ep.description or '—' }} |
+{% endfor %}
+
+### Critical Data Flows
+
+| Flow | Risk Notes |
+|------|-----------|
+{% for df in assessment.phase_0_triage.critical_data_flows %}
+| {{ df.flow or '—' }} | {{ df.risk_notes or '—' }} |
+{% endfor %}
+
+### Scope
+
+**Included:** {{ assessment.phase_0_triage.scope.included | join(', ') or '—' }}
+
+**Excluded:** {{ assessment.phase_0_triage.scope.excluded | join(', ') or '—' }}
+
+---
+
+## Phase 1 — Threat Modeling
+
+### 1.1 Architecture Reconstruction
+
+> See [Architecture](#architecture) section above for the DFD and trust boundary map.
+
+### 1.2 Component Inventory
+
+| Component | Type | Trust Zone | Capabilities | Data Handled | Credentials | MCP Risk Principles | Risk Level |
+|-----------|------|-----------|--------------|-------------|-------------|---------------------|-----------|
+{% for comp in assessment.phase_1_threat_modeling.component_inventory %}
+| {{ comp.component or '—' }} | {{ comp.type or '—' }} | {{ comp.trust_zone or '—' }} | {{ comp.capabilities | join(', ') or '—' }} | {{ comp.data_handled | join(', ') or '—' }} | {{ comp.credentials or '—' }} | {{ comp.mcp_risk_principles | join(', ') or '—' }} | {{ comp.risk_level or '—' }} |
+{% endfor %}
+
+### 1.3–1.5 Threat Register
+
+| ID | Location | Component | Threat | OWASP | MITRE ATLAS | Impact | Likelihood | Priority | Status |
+|----|----------|-----------|--------|-------|-------------|--------|-----------|---------|--------|
+{% for threat in assessment.phase_1_threat_modeling.threat_register %}
+| {{ threat.id }} | {{ threat.code_location or '—' }} | {{ threat.component or '—' }} | {{ threat.threat_description or '—' }} | {{ threat.owasp_category or '—' }} | {{ threat.mitre_atlas or '—' }} | {{ threat.impact or '—' }} | {{ threat.likelihood or '—' }} | {{ threat.priority or '—' }} | {{ threat.status or '—' }} |
+{% endfor %}
+
+{% for threat in assessment.phase_1_threat_modeling.threat_register %}
+#### {{ threat.id }} · {{ threat.priority or '—' }} · {{ threat.threat_description or '—' }}
+
+**Location:** `{{ threat.code_location or '—' }}`
+**Component:** {{ threat.component or '—' }}
+**OWASP:** {{ threat.owasp_category or '—' }} · **MITRE ATLAS:** {{ threat.mitre_atlas or '—' }}
+**Impact:** {{ threat.impact or '—' }} · **Likelihood:** {{ threat.likelihood or '—' }} · **Priority:** {{ threat.priority or '—' }}
+
+**Preconditions:** {{ threat.preconditions or '—' }}
+
+**Business Impact:** {{ threat.business_impact or '—' }}
+
+**Proposed Mitigations:**
+{% for m in threat.proposed_mitigations %}
+- {{ m }}
+{% else %}
+—
+{% endfor %}
+
+**Linked Findings:** {{ threat.linked_findings | join(', ') or '—' }}
+
+---
+{% endfor %}
+
+## Phase 2 — Code Vulnerability Audit
+
+### 2.1 Automated Scan (Semgrep)
+
+| Attribute | Value |
+|-----------|-------|
+| Available | {{ assessment.phase_2_code_audit.semgrep.available }} |
+| Rules Path | {{ assessment.phase_2_code_audit.semgrep.rules_path or '—' }} |
+| Rules Applied | {{ assessment.phase_2_code_audit.semgrep.rules_applied | join(', ') or '—' }} |
+| Raw Finding Count | {{ assessment.phase_2_code_audit.semgrep.raw_finding_count }} |
+
+### 2.1 + 2.2 Vulnerability Findings
+
+| ID | Severity | Source | Rule / Pattern | File | Component |
+|----|----------|--------|---------------|------|-----------|
+{% for vf in assessment.phase_2_code_audit.vulnerability_findings %}
+| {{ vf.id }} | {{ vf.severity or '—' }} | {{ vf.source or '—' }} | {{ vf.rule_or_pattern or '—' }} | {{ vf.file or '—' }} | {{ vf.component or '—' }} |
+{% endfor %}
+
+{% for vf in assessment.phase_2_code_audit.vulnerability_findings %}
+#### {{ vf.id }} · {{ vf.severity or '—' }} · {{ vf.rule_or_pattern or '—' }}
+
+**File:** `{{ vf.file or '—' }}`
+**Component:** {{ vf.component or '—' }}
+**Source:** {{ vf.source or '—' }}
+
+**Description:** {{ vf.description or '—' }}
+
+**Exploit Scenario:** {{ vf.exploit_scenario or '—' }}
+
+**Impact:** {{ vf.impact or '—' }}
+
+**Proposed Fix:** {{ vf.proposed_fix or '—' }}
+
+**Linked Threat:** {{ vf.linked_threat or '—' }}
+
+---
+{% endfor %}
+
+{% if assessment.system.ai_components.mcp_server.present %}
+### 2.3 MCP Compliance Spot Check
+
+| Req ID | Category | Control | Priority | Status | Evidence |
+|--------|----------|---------|---------|--------|---------|
+{% for req in assessment.phase_2_code_audit.mcp_compliance %}
+| {{ req.req_id or '—' }} | {{ req.category or '—' }} | {{ req.control or '—' }} | {{ req.priority or '—' }} | {{ req.status or '—' }} | {{ req.evidence or '—' }} |
+{% endfor %}
+
+---
+{% endif %}
+
+## Phase 3 — Unified Report
+
+### Critical & High Findings
+
+| ID | Finding | Location | Priority | Linked IDs |
+|----|---------|----------|----------|-----------|
+{% for f in assessment.phase_3_unified_report.critical_high_findings %}
+| {{ f.id or '—' }} | {{ f.finding or '—' }} | {{ f.location or '—' }} | {{ f.priority or '—' }} | {{ f.linked_ids | join(', ') or '—' }} |
+{% endfor %}
+
+### Priority Rationalization
+
+{{ assessment.phase_3_unified_report.priority_rationalization or '—' }}
+
+### Assessment Scope
+
+**Covered:** {{ assessment.phase_3_unified_report.scope.covered or '—' }}
+
+**Excluded:** {{ assessment.phase_3_unified_report.scope.excluded or '—' }}

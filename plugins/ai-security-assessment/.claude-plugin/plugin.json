@@ -1,0 +1,6 @@
+{
+  "name": "ai-security-assessment",
+  "version": "0.1.0",
+  "description": "Security assessment plugin for AI-native codebases: MCP servers, AI agents, and Claude Code skills/hooks/plugins. Provides threat modeling (OWASP/MITRE ATLAS threat register), code vulnerability scanning (Semgrep + manual), and MCP security requirements compliance checking.",
+  "author": "hecbercordova"
+}
