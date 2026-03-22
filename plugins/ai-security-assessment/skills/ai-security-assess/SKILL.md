@@ -80,6 +80,7 @@ From the code, build a minimal data flow diagram and trust boundary map:
 
 **Components to sketch:**
 - User/client → agent orchestrator → MCP client(s) → backing services
+- MCP servers → tools → backends (email, DB, shell, HTTP)
 - Data stores (vector DBs, relational DBs, blob storage, embeddings caches)
 - External services (SaaS APIs, model providers, identity providers)
 
@@ -287,6 +288,12 @@ Apply these pattern checks regardless of whether Semgrep ran:
   documented use case requires
 
 ### 2.3 MCP Requirements Spot Check (MCP servers only)
+
+> **Deep reference:** For MCP servers, follow the full assessment workflow in
+> `{baseDir}/mcp_security/mcp_assessment_guide.md`. It covers tool inventory,
+> confused deputy analysis, inbound and downstream AuthN/AuthZ, tool parameter
+> injection patterns, and blast radius reasoning — beyond what this phase summary
+> can capture.
 
 Check these HIGH-priority requirements against the code:
 
