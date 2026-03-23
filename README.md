@@ -8,6 +8,7 @@ Reusable Claude Code assets shared across projects: skills, hooks, sub-agents, a
 |-----------|------|---------|
 | Agent config | `CLAUDE.md` | Shared agent profile — drop into any project |
 | Skills plugin | `plugins/autoresearch/` | Autonomous experiment loop skills |
+| Skills plugin | `plugins/ai-security-assessment/` | Full-spectrum AI codebase security assessment |
 
 ## CLAUDE.md — Shared Agent Profile
 
@@ -60,6 +61,63 @@ autoresearch.ideas.md  # Optional deferred ideas backlog
 ```
 
 See [plugins/autoresearch/README.md](plugins/autoresearch/README.md) for full documentation and [.tasks/SKILL_DESIGN.md](.tasks/SKILL_DESIGN.md) for the architecture decision record.
+
+### `ai-security-assessment`
+
+Full-spectrum security assessment for AI-native codebases. Combines architectural threat modeling, automated Semgrep scanning, and manual code inspection into a single structured output — a YAML report that renders to Markdown.
+
+```
+plugins/ai-security-assessment/
+  skills/
+    ai-security-assess/
+      SKILL.md                        # Skill entry point (Phases 0–3)
+      mcp_security/
+        mcp_servers_principles.md     # P1–P6 high-risk classification principles
+        MCP_Security_Requirements.md  # Full MCP security requirements catalogue
+        mcp_assessment_guide.md       # Deep MCP assessment workflow
+      code_scanning/
+        rules/                        # Semgrep rules (MCP, agents, hooks, all providers)
+      templates/
+        assessment-report.yaml        # YAML report schema — single source of truth
+        assessment-report.j2          # Jinja2 template for Markdown rendering
+      scripts/
+        render_report.py              # Renders YAML → Markdown (uv run)
+```
+
+**Skill: `ai-security-assess`**
+
+Performs a full-spectrum security assessment of MCP servers, AI agents, and agent plugins/hooks/extensions from any platform (Claude Code, OpenAI, LangChain, AutoGen, CrewAI, or custom runtimes).
+
+Triggers: "security review this", "audit this agent code", "is this MCP server safe?", "find vulnerabilities in this AI system", "assess risks before we go to production", or when code imports `openai` / `anthropic` / `langchain` / `autogen` / `crewai` / `fastmcp` and a review is requested.
+
+**Phases:**
+
+| Phase | Output |
+|-------|--------|
+| 0 — Triage | Entry points, data flows, scope confirmation |
+| 1 — Threat Modeling | Architecture DFD, component inventory (P1–P6), OWASP/MITRE ATLAS threat register |
+| 2 — Code Audit | Semgrep scan + manual inspection + MCP compliance spot check |
+| 3 — Unified Report | Cross-referenced findings, risk counts, prioritized remediations |
+
+**Report pipeline:**
+
+The skill writes all findings to `security-assessment/assessment-report.yaml` (single source of truth). The Markdown report is generated from it — never filled independently:
+
+```bash
+uv run plugins/ai-security-assessment/skills/ai-security-assess/scripts/render_report.py \
+  security-assessment/assessment-report.yaml
+```
+
+**Installation (global — available in all sessions):**
+
+```bash
+ln -s /path/to/plugins/ai-security-assessment/skills/ai-security-assess \
+  ~/.claude/skills/ai-security-assess
+```
+
+See [plugins/ai-security-assessment/](plugins/ai-security-assessment/) for the full plugin and reference materials.
+
+---
 
 ## Skill Authoring Standards
 
