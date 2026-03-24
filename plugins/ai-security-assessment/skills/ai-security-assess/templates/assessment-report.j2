@@ -17,8 +17,26 @@
 | Component Type | Present | Details |
 |----------------|---------|---------|
 | AI Agent | {{ assessment.system.ai_components.agent.present }} | Frameworks: {{ assessment.system.ai_components.agent.frameworks | join(', ') or '—' }} |
-| MCP Server | {{ assessment.system.ai_components.mcp_server.present }} | Transport: {{ assessment.system.ai_components.mcp_server.transport or '—' }} · Tools: {{ assessment.system.ai_components.mcp_server.tools | join(', ') or '—' }} |
+| MCP Server | {{ assessment.system.ai_components.mcp_server.present }} | Transport: {{ assessment.system.ai_components.mcp_server.transport | join(', ') or '—' }} · Tools: {{ assessment.system.ai_components.mcp_server.tools | selectattr('name') | map(attribute='name') | join(', ') or '—' }} |
 | Plugin / Hook / Extension | {{ assessment.system.ai_components.plugin_hook_extension.present }} | Platform: {{ assessment.system.ai_components.plugin_hook_extension.platform or '—' }} · Components: {{ assessment.system.ai_components.plugin_hook_extension.components | join(', ') or '—' }} |
+
+{% if assessment.system.ai_components.mcp_server.present %}
+### MCP Server Tools
+
+| Tool | Description |
+|------|-------------|
+{% for tool in assessment.system.ai_components.mcp_server.tools %}
+| `{{ tool.name or '—' }}` | {{ tool.description or '—' }} |
+{% endfor %}
+
+### MCP Server Risk Profile
+
+| Attribute | Value |
+|-----------|-------|
+| Principles Triggered | {{ assessment.system.ai_components.mcp_server.server_principles.triggered | join(', ') or '—' }} |
+| Overall Risk | {{ assessment.system.ai_components.mcp_server.server_principles.overall_risk or '—' }} |
+| Rationale | {{ assessment.system.ai_components.mcp_server.server_principles.rationale or '—' }} |
+{% endif %}
 
 ---
 
