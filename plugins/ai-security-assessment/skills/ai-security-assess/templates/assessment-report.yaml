@@ -34,9 +34,21 @@ assessment:
 
       mcp_server:
         present: false
-        transport: null       # stdio | http | sse
-        tools: []             # names of every registered MCP tool
+        transport: []         # one or more of: stdio | http | sse  (null if undetermined)
+        tools:                # one entry per registered MCP tool
+          - name: null        # exact tool name as registered
+            description: null # what the tool does (LLM-visible docstring / description field)
         entry_points: []      # server entrypoint files
+        # Which of the 6 high-risk principles apply to this MCP server as a whole.
+        # Evaluate at the server level after classifying all individual tools.
+        # Principles: P1 Unbounded External Communication | P2 Data Store Access |
+        #             P3 Code/Command Execution | P4 Filesystem Access |
+        #             P5 Credential/Secret Access | P6 Cross-Tool Orchestration
+        # See mcp_security/mcp_servers_principles.md for full definitions.
+        server_principles:
+          triggered: []       # e.g. [P1, P3] — principles triggered by any tool in this server
+          overall_risk: null  # HIGH | MEDIUM | LOW — worst-case across all tools and modifiers
+          rationale: null     # one sentence explaining the overall risk rating
 
       plugin_hook_extension:
         present: false
