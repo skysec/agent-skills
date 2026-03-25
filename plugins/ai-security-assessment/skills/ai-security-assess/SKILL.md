@@ -163,6 +163,22 @@ For each major data flow, trace through the code step by step:
 | Model-assisted Data Exfiltration | LLM packaging + sending sensitive data via tools |
 | LLM Denial of Service | Unbounded loops, context exhaustion, excessive tool call chains |
 
+4. **If an AI agent is present**, additionally enumerate threats against the OWASP Agentic AI
+   taxonomy (T1–T17) defined in `{baseDir}/agent_security/AGENT_SECURITY_REQUIREMENTS.md`.
+   For each threat that applies to the target system, create a threat register entry. Priority
+   threats to check first:
+
+| TID | Threat | Key Code Signal |
+|-----|--------|----------------|
+| T1 | Memory Poisoning | User input stored in long-term memory / vector store without sanitization |
+| T2 | Tool Misuse | Agent can chain tools to perform unintended high-impact operations |
+| T3 | Privilege Compromise | Agent inherits over-scoped session tokens; no JIT access revocation |
+| T6 | Intent Breaking & Goal Manipulation | Untrusted web/tool content injected into planning context |
+| T8 | Repudiation & Untraceability | Tool invocations not logged with identity + params + result |
+| T11 | Unexpected RCE and Code Attacks | Agent generates and executes code without sandboxing |
+| T12 | Agent Communication Poisoning | Inter-agent messages accepted without validation or authenticity check |
+| T13 | Rogue Agents in Multi-Agent Systems | No mutual authentication between agents; any caller can impersonate orchestrator |
+
 ### 1.4 Risk Rating
 
 For each threat:
@@ -322,6 +338,30 @@ Write `security-assessment/mcp-compliance.md`:
 ```
 | Req ID | Category | Priority | Status | Evidence / Finding |
 ```
+
+### 2.4 Agent Security Requirements Spot Check (AI agents only)
+
+> **Deep reference:** For AI agents, consult the full OWASP Agentic AI threat catalogue in
+> `{baseDir}/agent_security/AGENT_SECURITY_REQUIREMENTS.md` (T1–T17) for complete mitigation
+> guidance and MITRE ATLAS mappings.
+
+Skip this section if no AI agent was detected in Phase 0.
+
+Check these highest-priority controls against the code:
+
+| TID | Control | How to check |
+|-----|---------|-------------|
+| T1 Memory Poisoning | Session isolation + memory write validation | Is user content written to shared memory/vector store without sanitization? Cross-session reads gated? |
+| T2 Tool Misuse | Rate-limiting + JIT access + approval gates | Destructive tool ops (send, delete, execute) require explicit approval? Tool call frequency bounded? |
+| T3 Privilege Compromise | Least-privilege credentials + token scoping | Agent tokens scoped to minimum required? Credentials not inherited from broad user session? |
+| T6 Intent Breaking | Goal consistency validation | Untrusted data (web fetch, tool output) injected into planning context without structural separation? |
+| T7 Misaligned Behaviors | Human-in-loop for high-risk ops | High-impact autonomous actions (financial, admin, infra) require human confirmation? |
+| T8 Repudiation | Audit log with identity + params | All tool invocations logged with agent identity, full params, and outcome? |
+| T11 RCE | Code sandboxing | Agent-generated code executed in isolated container/sandbox? `exec`/`eval` absent or strictly gated? |
+| T12 Agent Comm Poisoning | Inter-agent message validation | Messages from other agents validated for schema and authenticity? Agent-to-agent channels authenticated? |
+| T13 Rogue Agents | Mutual agent authentication | Orchestrator identity verified by sub-agents? No implicit trust between agents in multi-agent topology? |
+
+**Output**: Append agent security findings to `security-assessment/vulnerability-findings.md` using the standard VF-NNN format, tagging with the TID (e.g., `T1 Memory Poisoning`).
 
 **Output**: Write `security-assessment/vulnerability-findings.md` using this template per finding:
 ```
