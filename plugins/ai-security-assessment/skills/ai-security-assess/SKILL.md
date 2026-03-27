@@ -86,27 +86,23 @@ finding and skip them.
 
 ### 1.1 Architecture Reconstruction
 
-From the code, build a minimal data flow diagram and trust boundary map:
+> **Detailed guide:** `{baseDir}/diagrams/DFD_GUIDE.md` — AI-native Mermaid templates, 6-phase
+> code extraction process, and a trust-boundary threat surface map that feeds directly into
+> §1.2 (Component Inventory) and §1.3 (Threat Enumeration).
 
-**Components to sketch:**
-- User/client → agent orchestrator → MCP client(s) → backing services
-- MCP servers → tools → backends (email, DB, shell, HTTP)
-- Data stores (vector DBs, relational DBs, blob storage, embeddings caches)
-- External services (SaaS APIs, model providers, identity providers)
+Run the 6-phase extraction process in `DFD_GUIDE.md` against the codebase. Produce:
 
-**Trust boundaries to mark:**
-- User devices vs. your services
-- Public internet vs. internal network
-- Agent runtime vs. privileged MCP servers
-- Your systems vs. third-party integrations
+1. **DFD** (`graph TD`) — trust boundary zones (Public, Auth, Agent/Orchestrator, MCP Tools,
+   Data/Backing Services, LLM Provider) with every node replaced by an actual component name.
+   Annotate edges with `⚠️` wherever Phase 5 of the guide flags a missing control.
 
-**Security context to capture:**
-- How AuthN works (tokens, API keys, OAuth, mTLS) — or where it is missing
-- Where authorization decisions live (middleware, inline checks, or absent)
-- Where secrets are stored (source code, config files, env vars, secret managers)
+2. **Agent Tool-Call Sequence** (`sequenceDiagram`) — trace the primary user-request → LLM →
+   tool-call → backing-service path, marking each security checkpoint where code evidence shows
+   the control is absent.
 
-Write `security-assessment/architecture-dfd.md` as a Mermaid flowchart or ASCII diagram with a
-trust boundary narrative paragraph underneath.
+Write both diagrams to `security-assessment/architecture-dfd.md` followed by a trust boundary
+narrative paragraph covering: how AuthN/AuthZ works (or is missing), where secrets are stored,
+and which cross-boundary flows are uncontrolled.
 
 ### 1.2 Component Inventory
 
