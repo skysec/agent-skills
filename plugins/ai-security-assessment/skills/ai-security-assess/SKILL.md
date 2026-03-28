@@ -359,6 +359,48 @@ Check these highest-priority controls against the code:
 
 **Output**: Append agent security findings to `security-assessment/vulnerability-findings.md` using the standard VF-NNN format, tagging with the TID (e.g., `T1 Memory Poisoning`).
 
+### 2.5 Skill / Plugin Security Assessment (agent plugins, hooks, extensions only)
+
+> **Deep reference:** `{baseDir}/skill_security/SKILL_SECURITY_REQUIREMENTS.md` — OWASP AST10
+> threat table, P1/P2/P3 assessment checklists, BUILD guidance, framework mappings, and
+> empirical baselines from Snyk ToxicSkills (91% of malicious skills detected via prompt
+> injection; 100% co-occurrence for malicious code and suspicious downloads).
+
+Skip this section if no agent plugin / hook / extension was detected in Phase 0.
+
+**Step 1 — Priority Decision Tree (fast-fail).** Run these six checks first. A single hit is
+a Critical finding — report it immediately and mark the skill `BLOCKED`.
+
+| Check | Block signal | OWASP AST | MITRE ATLAS |
+|-------|-------------|-----------|-------------|
+| Obfuscated content | Base64 blocks, Unicode steganography, non-Latin instruction text | AST01 | AML.T0051, Context Poisoning |
+| External execution | `curl\|bash`, `wget\|sh`, `fetch(url) → exec`, dynamic remote import | AST02 | AML.T0010 |
+| Identity file write | Write access to `SOUL.md`, `MEMORY.md`, `AGENTS.md` (unless explicitly the skill's documented purpose) | AST01 | Memory Manipulation |
+| Hardcoded secrets | API keys, tokens, passwords in YAML / Markdown / script (`sk-`, `ghp_`, `AKIA`, `Bearer `) | AST04 | AML.T0055 |
+| Unsafe deserialization | YAML type tags: `!!python/object`, `!!exec`, `!!binary` | AST05 | AML.T0050 |
+| Semantic mismatch | Skill instructions do not match stated purpose; authority claims; "ignore previous instructions" | AST08 | AML.T0051 |
+
+**Step 2 — P1/P2/P3 Checklist.**
+
+| Priority | Check | What to verify |
+|---------|-------|---------------|
+| P1 | Malicious instruction injection | No DAN-style overrides, no cross-agent authority claims, no goal-manipulation language |
+| P1 | Malicious embedded code | No scripts that read `~/.ssh`, `~/.aws`, env files or exfiltrate data to remote endpoints |
+| P2 | Permission minimality | Every declared permission (`network`, `shell`, file paths) necessary and documented |
+| P2 | Shell access | `shell: true` raises risk tier to L2+ — document why it is required |
+| P2 | Network scope | Domain allowlist present (`allow: [api.x.com]`), not binary `network: true` |
+| P2 | Claude Code hooks | Every hook in `.claude/settings.json` reviewed in isolation (see §2.2 hook checks) |
+| P2 | Third-party content | Fetched web/API/social content treated as untrusted data — never injected as instruction |
+| P2 | Dependency pinning | No version ranges (`>=`, `^`, `~`) — exact hash pinning required |
+| P3 | Publisher identity | `author.identity` DID resolvable; `signature` present and matches `signing_key` |
+| P3 | Scan provenance | `scan_status` field present; scan date < 30 days old |
+| P3 | Risk tier declared | `risk_tier` field present (L0–L3) |
+| P3 | Content hash | `content_hash` present and verified against package contents |
+
+**Output**: Append skill security findings to `security-assessment/vulnerability-findings.md`
+using the standard VF-NNN format, tagging with the OWASP AST category (e.g., `AST01 Malicious
+Skill`) and the OWASP ASI threat ID where applicable.
+
 **Output**: Write `security-assessment/vulnerability-findings.md` using this template per finding:
 ```
 ### VF-NNN · <Severity> · <rule or pattern>
