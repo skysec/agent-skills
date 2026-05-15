@@ -1,0 +1,6 @@
+{
+  "name": "sec-vuln-research",
+  "version": "1.0.0",
+  "description": "Multi-stage LLM-driven pipeline for finding, validating, and operationalizing security vulnerabilities in source code. Includes three coordinated skills: sec-vuln-research (full pipeline orchestrator), sec-vuln-triage (adversarial multi-round verifier), and sec-attack-chain (attack chain + PoC generator).",
+  "author": "Trail of Bits"
+}
