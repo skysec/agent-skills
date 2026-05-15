@@ -97,15 +97,20 @@ report:
       attack_chains_generated: 0
 
   # ----------------------------------------------------------------------------
-  # RECOMMENDATIONS  (populated in Stage 8 — ordered by priority)
+  # RECOMMENDATIONS  (populated in Stage 8 — ordered by priority_score descending)
+  # priority_score = (severity × 0.50) + (confidence × 0.25) + (attacker_position × 0.25)
+  # See references/pipeline-stages.md §Stage 8 for score tables and tie-breaking rules.
   # ----------------------------------------------------------------------------
   recommendations:
     - rank: 1
-      id: null                # VULN-NNN
-      title: null             # short title
-      location: null          # file:line
-      effort: null            # Low | Medium | High
-      description: null       # what to do and why it is the most urgent item
+      id: null                  # VULN-NNN
+      title: null               # short title
+      location: null            # file:line
+      priority_score: null      # float computed per matrix in pipeline-stages.md §Stage 8
+      severity: null            # final_severity after Stage 7 calibration
+      attacker_position: null   # remote_unauth | remote_auth_low | remote_auth_elevated | local
+      chained_with: null        # VULN-NNN of paired finding, or null
+      description: null         # what to do and why it is the highest-priority item
 
   # ----------------------------------------------------------------------------
   # FINDINGS  (populated across Stages 3–7)

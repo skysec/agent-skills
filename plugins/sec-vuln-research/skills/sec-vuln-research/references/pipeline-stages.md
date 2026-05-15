@@ -277,6 +277,28 @@ Key checks:
 - Every secret comparison: constant-time?
 - Every random value for security: CSPRNG (`secrets` / `crypto/rand` / not `math/rand`)?
 
+### Hunter severity rubric
+
+All four specialists must use this rubric when assigning `"severity"` to a finding.
+The attack chain skill uses the same rubric — if a hunter's label and the attack chain
+label differ by more than one level, Stage 7 takes the lower (conservative).
+
+| Severity | Attacker position | Impact class | Complexity |
+|----------|------------------|--------------|-----------|
+| **Critical** | Remote, unauthenticated | RCE, full priv-esc, or auth bypass | Low — single malformed input |
+| **High** | Remote, unauthenticated | Significant data exfil, partial priv-esc, DoS | Any |
+| **High** | Remote, authenticated (any role) | RCE, full priv-esc, or auth bypass | Any |
+| **Medium** | Remote, authenticated | Significant data exfil, partial priv-esc | Any |
+| **Medium** | Local | RCE or full priv-esc | Any |
+| **Low** | Local | Limited impact, info leak, or DoS | High preconditions |
+| **Info** | Any | No direct security boundary crossed in isolation | — |
+
+**Bias rule:** when in doubt, go one level higher — undersizing risk is more dangerous than oversizing.
+**Chaining rule:** if this finding chains with another (e.g., info-leak enables memory corruption),
+state the dependency and rate the *combined* impact, not the isolated one.
+
+---
+
 ### Tier B — single-pass guided hunt
 
 One LLM call with full context briefing + graph flags + file content. Ask for a JSON array
@@ -302,3 +324,54 @@ to all files in the subsystem. Focus on bugs that span file boundaries:
 
 Subsystem hunter has access to all standard tools plus `engine.paths_between(src, dst)` to
 confirm cross-file call paths.
+
+---
+
+## Stage 8 — Report Generation
+
+### Recommendations priority matrix
+
+The `recommendations` section of the YAML report is a ranked list ordered by a composite
+score. Compute the score for each finding after Stage 7 calibration:
+
+```
+priority_score = (severity_score × 0.50)
+              + (confidence_score × 0.25)
+              + (attacker_position_score × 0.25)
+```
+
+**Severity score** (use `final_severity` after Stage 7 calibration):
+
+| Label | Score |
+|-------|-------|
+| critical | 4 |
+| high | 3 |
+| medium | 2 |
+| low | 1 |
+
+**Confidence score** — use `triage.confidence_score` (float 0.0–1.0) scaled to 0–4:
+`confidence_score × 4`
+
+**Attacker position score** — derived from the attack chain entry point trust level:
+
+| Position | Score |
+|----------|-------|
+| Remote, unauthenticated | 4 |
+| Remote, authenticated (low-privilege role) | 3 |
+| Remote, authenticated (elevated role) | 2 |
+| Local | 1 |
+
+If no attack chain was generated (finding did not reach `root_cause_explained`), use
+`attacker_position_score = 2` as a conservative default.
+
+**Tie-breaking:** when two findings have identical `priority_score`, rank by:
+1. `severity_score` descending
+2. `confidence_score` descending
+3. Alphabetical by `id`
+
+**Chained findings:** a finding pair confirmed as exploitable in Stage 7 (e.g.,
+info-leak + memory corruption) receives the combined severity's score for both entries.
+List the pair consecutively and note the dependency in the recommendation text.
+
+**Output:** the `recommendations` list in `vuln-research-report.yaml` must be sorted by
+`priority_score` descending before the report is rendered.

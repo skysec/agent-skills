@@ -34,14 +34,17 @@
 
 ## Top Recommendations
 
-| Rank | ID | Finding | Location | Effort |
-|------|----|---------|----------|--------|
+| Rank | ID | Finding | Location | Severity | Attacker Position | Priority Score |
+|------|----|---------|----------|----------|------------------|---------------|
 {% for rec in report.recommendations %}
-| {{ rec.rank }} | {{ rec.id or '—' }} | {{ rec.title or '—' }} | {{ rec.location or '—' }} | {{ rec.effort or '—' }} |
+| {{ rec.rank }} | {{ rec.id or '—' }} | {{ rec.title or '—' }} | {{ rec.location or '—' }} | {{ rec.severity or '—' }} | {{ rec.attacker_position or '—' }} | {{ rec.priority_score or '—' }} |
 {% endfor %}
 
 {% for rec in report.recommendations %}
 ### {{ rec.rank }}. {{ rec.id or '—' }} — {{ rec.title or '—' }}
+
+**Severity:** {{ rec.severity or '—' }} | **Attacker position:** {{ rec.attacker_position or '—' }} | **Priority score:** {{ rec.priority_score or '—' }}
+{% if rec.chained_with %}**Chained with:** {{ rec.chained_with }}{% endif %}
 
 {{ rec.description or '—' }}
 
