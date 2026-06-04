@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.mcp_server.detected == true",
+      "passed": true,
+      "evidence": "Field secdeepwiki.components[0].classification.mcp_server.detected = True"
+    },
+    {
+      "text": "All mcp_server tools have a non-null risk_classification",
+      "passed": true,
+      "evidence": "All 7 items checked for field 'risk_classification'"
+    },
+    {
+      "text": "At least one entry_point of type mcp_tool exists",
+      "passed": true,
+      "evidence": "List at secdeepwiki.components[0].entry_points has 7 items (min 1)"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists; top-level keys: ['secdeepwiki']"
+    },
+    {
+      "text": "At least one security_observation with a non-empty observation string exists",
+      "passed": true,
+      "evidence": "Found 7 observations; non-empty: True"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

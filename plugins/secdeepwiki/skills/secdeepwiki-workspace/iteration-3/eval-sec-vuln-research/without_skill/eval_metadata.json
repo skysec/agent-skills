@@ -1,0 +1,40 @@
+{
+  "eval_id": 3,
+  "eval_name": "sec-vuln-research-plugin-inventory",
+  "prompt": "Run secdeepwiki on the security vulnerability research plugin at /Users/hecbercordova/Documents/Projects/ai_security/security_autoresearch/agent-skills/plugins/sec-vuln-research to generate a security inventory. I need to understand its components, what entry points or interfaces it exposes.",
+  "assertions": [
+    {
+      "id": "snapshot_yaml_valid",
+      "description": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "type": "file_exists_with_key",
+      "file": "snapshot.yaml",
+      "key": "secdeepwiki"
+    },
+    {
+      "id": "at_least_one_component",
+      "description": "snapshot.yaml has at least one component defined",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.components",
+      "min_length": 1
+    },
+    {
+      "id": "multiple_components_detected",
+      "description": "At least 3 components detected (root + at least 2 skills)",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.components",
+      "min_length": 3
+    },
+    {
+      "id": "attack_surface_computed",
+      "description": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "type": "yaml_field_not_null",
+      "path": "secdeepwiki.cross_component.attack_surface.total_external_entry_points"
+    },
+    {
+      "id": "confidence_set",
+      "description": "analysis.overall_confidence is set (not null)",
+      "type": "yaml_field_not_null",
+      "path": "secdeepwiki.analysis.overall_confidence"
+    }
+  ]
+}

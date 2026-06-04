@@ -1,0 +1,6 @@
+{
+  "name": "secdeepwiki",
+  "version": "1.0.0",
+  "description": "Generates a security-enriched knowledge base for any git repository. Component classification, entry point catalog, DFDs, trust boundaries, auth/crypto analysis, and prioritized attack surface map. Consumed by pen testers, AppSec engineers, threat modelers, and SAST/DAST operators.",
+  "author": "Trail of Bits"
+}

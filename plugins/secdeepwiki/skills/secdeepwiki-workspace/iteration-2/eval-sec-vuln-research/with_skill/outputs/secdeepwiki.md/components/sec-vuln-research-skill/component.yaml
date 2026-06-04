@@ -1,0 +1,319 @@
+component:
+  analysis_provenance:
+    carried_forward_reason: null
+    from_commit_sha: cfe609975c7a806b7cc2b9ec3f616ed460e9878c
+    from_snapshot_id: null
+    modules_rerun:
+    - classify
+    - stack-analyze
+    - entry-point-scan
+    - auth-analyze
+    - crypto-analyze
+    - observability-scan
+    - data-store-detect
+    - confidence-compute
+    source: fresh_analysis
+  authentication:
+    credential_storage: null
+    mechanisms:
+    - configuration_source: null
+      evidence:
+      - 'scripts/analyze.py: no authentication code present; CLI takes a local filesystem
+        path'
+      - 'scripts/render_report.py: no authentication code present'
+      - 'SKILL.md: authentication deferred entirely to the host Claude agent runtime'
+      mfa_enforced: false
+      provider: null
+      token_storage: none
+      type: none
+    service_to_service_auth:
+      detected: false
+      evidence:
+      - No HTTP client calls, API key handling, or inter-service auth in any Python
+        script
+      mechanism: none
+    session_management:
+      mechanism: none
+      session_store: none
+  authorization:
+    api_key_management:
+      revocation_supported: false
+      rotation_supported: false
+      scoping: null
+    enforcement_points: []
+    framework: null
+    model: none
+    policy_location: null
+    resource_types: []
+  classification:
+    ai_agent:
+      detected: false
+      evidence: []
+      framework: null
+      guardrails_present: false
+      memory_mechanism: none
+      models_referenced: []
+      rag_detected: false
+      tools_defined: []
+    api_service:
+      detected: false
+      evidence: []
+      framework: null
+      spec_file:
+        format: null
+        path: null
+        present: false
+      style: null
+    browser_extension:
+      detected: false
+      evidence: []
+      manifest_version: null
+      permissions_requested: []
+      target_browsers: []
+    cli_tool:
+      commands:
+      - accepts_file_input: true
+        accepts_url_input: false
+        description: 'Stage 0 ingestion: builds a trailmark CodeGraph, runs pre-analysis
+          passes (blast_radius, taint, privilege_boundaries, entrypoints), optionally
+          augments with a SARIF file, and writes ingest_graph.json with per-file metrics.
+
+          '
+        name: analyze
+      detected: true
+      entry_point: skills/sec-vuln-research/scripts/analyze.py
+      evidence:
+      - 'scripts/analyze.py: argparse CLI with positional <target_path> and --output
+        / --sarif flags'
+      framework: argparse
+    data_pipeline:
+      detected: false
+      evidence: []
+      framework: null
+    database_migration:
+      database_type: null
+      detected: false
+      evidence: []
+      migration_framework: null
+      pii_columns_detected: []
+    event_consumer_or_worker:
+      detected: false
+      event_sources: []
+      evidence: []
+      processing_model: null
+      queue_technology: null
+    fork_or_vendor_copy:
+      detected: false
+      evidence: []
+      local_modifications: false
+      upstream_commit: null
+      upstream_url: null
+    infrastructure_as_code:
+      detected: false
+      evidence: []
+      frameworks: []
+    library_or_sdk:
+      detected: true
+      evidence:
+      - 'SKILL.md: defines reusable pipeline instructions loaded by the Claude agent
+        runtime'
+      - 'templates/vuln-research-report.yaml: reusable blank report template'
+      - 'templates/vuln-research-report.j2: Jinja2 template consumed by render_report.py'
+      package_registry: null
+    machine_learning_model:
+      detected: false
+      evidence: []
+      inference_server: false
+      ml_framework: null
+      training_pipeline: false
+    mcp_server:
+      authentication: null
+      detected: false
+      evidence: []
+      framework: null
+      prompts: []
+      resources: []
+      tools: []
+      transport: null
+    mobile_application:
+      detected: false
+      evidence: []
+      framework: null
+      platform: null
+    proxy_or_gateway:
+      detected: false
+      evidence: []
+      routes_to: []
+      technology: null
+      type: null
+    scheduled_job:
+      detected: false
+      evidence: []
+      jobs: []
+      scheduler: null
+    smart_contract:
+      blockchain: null
+      detected: false
+      evidence: []
+      language: null
+    web_application:
+      backend_framework: null
+      detected: false
+      evidence: []
+      frontend_framework: null
+      sub_type: null
+  confidence:
+    limitations:
+    - 'The skill''s primary runtime surface is SKILL.md (natural-language instructions
+      read by a Claude agent). That surface is opaque to static analysis — what the
+      agent does at runtime (file reads, grep calls, trailmark API calls) is not statically
+      traceable.
+
+      '
+    - 'trailmark is an optional runtime dependency. Its API (CodeGraph, preanalysis(),
+      attack_surface(), etc.) is called but not present in this repo; behavior of
+      the trailmark-dependent code paths cannot be verified from this snapshot alone.
+
+      '
+    manual_review_recommended: false
+    overall: 0.9
+  cryptography:
+    operations_detected: []
+  data_stores:
+  - connection_config_source: cli_argument
+    data_classification: internal
+    evidence:
+    - 'scripts/analyze.py lines 309-311: out_path.write_text(json.dumps(result, indent=2))'
+    name: ingest_graph.json
+    technology: local filesystem (JSON)
+    type: file_system
+  - connection_config_source: cli_argument
+    data_classification: internal
+    evidence:
+    - 'scripts/render_report.py: reads YAML, writes .md alongside it'
+    - 'templates/vuln-research-report.yaml: blank report template'
+    name: vuln-research-report.yaml / vuln-research-report.md
+    technology: local filesystem (YAML + Markdown)
+    type: file_system
+  - connection_config_source: cli_argument
+    data_classification: internal
+    evidence:
+    - 'scripts/analyze.py line 59: engine.augment_sarif(str(sarif_path))'
+    name: findings.sarif (input, optional)
+    technology: local filesystem (SARIF JSON)
+    type: file_system
+  description: 'The primary orchestrator skill. Defines a multi-stage LLM-driven vulnerability
+    research pipeline (Stages 0–8): trailmark graph build, file ranking, context generation,
+    specialist vulnerability hunting, adversarial triage, cross-file variant analysis,
+    attack chain generation, deduplication, severity calibration, and report generation.
+    Includes a Python script (analyze.py) for Stage 0 graph build, a Jinja2-based
+    report renderer (render_report.py), a YAML report template, and a Jinja2 report
+    template.
+
+    '
+  entry_points:
+  - authentication_required: 'no'
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-001
+    input_validation:
+      framework: argparse
+      present: true
+      schema_path: scripts/analyze.py (argparse definitions, lines ~290-300)
+    line_number: 289
+    path_or_name: analyze.py <target_path>
+    rate_limited: false
+    request_body_type: none
+    source_file: skills/sec-vuln-research/scripts/analyze.py
+    type: cli_command
+  - authentication_required: 'no'
+    authorization_model: none
+    file_upload_accepted: true
+    http_method: null
+    id: EP-002
+    input_validation:
+      framework: argparse
+      present: true
+      schema_path: scripts/analyze.py (--sarif optional arg)
+    line_number: 295
+    path_or_name: analyze.py --sarif <path>
+    rate_limited: false
+    request_body_type: none
+    source_file: skills/sec-vuln-research/scripts/analyze.py
+    type: cli_command
+  - authentication_required: 'no'
+    authorization_model: none
+    file_upload_accepted: true
+    http_method: null
+    id: EP-003
+    input_validation:
+      framework: argparse
+      present: true
+      schema_path: scripts/render_report.py (argparse definitions)
+    line_number: 54
+    path_or_name: render_report.py <yaml_file>
+    rate_limited: false
+    request_body_type: none
+    source_file: skills/sec-vuln-research/scripts/render_report.py
+    type: cli_command
+  - authentication_required: conditional
+    authorization_model: unknown
+    file_upload_accepted: false
+    http_method: null
+    id: EP-004
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 1
+    path_or_name: sec-vuln-research (SKILL.md)
+    rate_limited: false
+    request_body_type: none
+    source_file: skills/sec-vuln-research/SKILL.md
+    type: plugin_hook
+  id: sec-vuln-research-skill
+  name: sec-vuln-research Skill (Pipeline Orchestrator)
+  observability:
+    audit_trail_present: false
+    logging_framework: print (stdlib)
+  owner: null
+  path: skills/sec-vuln-research
+  tech_stack:
+    frameworks:
+    - category: security
+      name: trailmark
+      version: '>=0.1'
+    - category: other
+      name: jinja2
+      version: '>=3.1'
+    - category: other
+      name: pyyaml
+      version: '>=6.0'
+    - category: other
+      name: argparse
+      version: null
+    languages:
+    - name: Python
+      role: application
+      version_constraint: '>=3.12'
+    - name: Python
+      role: scripting
+      version_constraint: '>=3.11'
+    - name: Jinja2
+      role: scripting
+      version_constraint: null
+    - name: YAML
+      role: infrastructure
+      version_constraint: null
+    - name: Markdown
+      role: infrastructure
+      version_constraint: null
+    package_managers:
+    - lockfile_path: null
+      lockfile_present: false
+      name: uv
+    runtime:
+      container_base_image: null
+      name: Python
+      version: '>=3.11'

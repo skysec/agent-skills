@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "snapshot.yaml has at least one component defined",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "At least 3 components detected (root + at least 2 skills)",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "analysis.overall_confidence is set (not null)",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  }
+}

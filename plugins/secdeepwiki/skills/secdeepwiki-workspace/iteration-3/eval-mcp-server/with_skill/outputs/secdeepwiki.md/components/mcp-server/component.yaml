@@ -1,0 +1,360 @@
+component:
+  analysis_provenance:
+    carried_forward_reason: null
+    from_commit_sha: null
+    from_snapshot_id: null
+    modules_rerun:
+    - classify
+    - stack-analyze
+    - entry-point-scan
+    - auth-analyze
+    - crypto-analyze
+    - observability-scan
+    - data-store-detect
+    - confidence-compute
+    source: fresh_analysis
+  authentication:
+    credential_storage: null
+    mechanisms:
+    - configuration_source: null
+      evidence:
+      - 'mcp_server.py:93 — comment: ''# Run with no authentication middleware'''
+      - mcp_server.py:94 — mcp.run(transport="http", host="0.0.0.0", port=8080) —
+        no auth parameter passed
+      mfa_enforced: false
+      provider: null
+      token_storage: none
+      type: none
+    service_to_service_auth:
+      detected: false
+      evidence:
+      - mcp_server.py:12-14 — Three credentials present as module-level hardcoded
+        string literals (values redacted)
+      mechanism: none
+    session_management:
+      mechanism: none
+      session_store: null
+  authorization:
+    api_key_management:
+      revocation_supported: null
+      rotation_supported: null
+      scoping: null
+    enforcement_points:
+    - coverage: none
+      location: none
+    framework: null
+    model: none
+    policy_location: null
+    resource_types: []
+  classification:
+    ai_agent:
+      detected: false
+      evidence: []
+      framework: null
+      guardrails_present: false
+      memory_mechanism: null
+      models_referenced: []
+      rag_detected: false
+      tools_defined: []
+    api_service:
+      detected: false
+      evidence: []
+      framework: null
+      spec_file:
+        format: null
+        path: null
+        present: false
+      style: null
+    browser_extension:
+      detected: false
+      evidence: []
+      manifest_version: null
+      permissions_requested: []
+      target_browsers: []
+    cli_tool:
+      commands: []
+      detected: false
+      entry_point: null
+      evidence: []
+      framework: null
+    data_pipeline:
+      detected: false
+      evidence: []
+      framework: null
+    database_migration:
+      database_type: null
+      detected: false
+      evidence: []
+      migration_framework: null
+      pii_columns_detected: []
+    event_consumer_or_worker:
+      detected: false
+      event_sources: []
+      evidence: []
+      processing_model: null
+      queue_technology: null
+    fork_or_vendor_copy:
+      detected: false
+      evidence: []
+      local_modifications: false
+      upstream_commit: null
+      upstream_url: null
+    infrastructure_as_code:
+      detected: false
+      evidence: []
+      frameworks: []
+    library_or_sdk:
+      detected: false
+      evidence: []
+      package_registry: null
+    machine_learning_model:
+      detected: false
+      evidence: []
+      inference_server: false
+      ml_framework: null
+      training_pipeline: false
+    mcp_server:
+      authentication: none
+      detected: true
+      evidence:
+      - mcp_server.py:5 — from fastmcp import FastMCP
+      - mcp_server.py:16 — mcp = FastMCP("InternalTools")
+      - mcp_server.py:94 — mcp.run(transport="http", host="0.0.0.0", port=8080)
+      - 'mcp_server.py:93 — comment: ''# Run with no authentication middleware'''
+      framework: fastmcp
+      prompts: []
+      resources: []
+      tools:
+      - description: Read any file from the server filesystem.
+        input_schema: '{"path": "str"}'
+        name: read_file
+        risk_classification: read_only
+      - description: Write content to a file at the specified path.
+        input_schema: '{"path": "str", "content": "str"}'
+        name: write_file
+        risk_classification: write
+      - description: 'Execute a shell command on the server. The docstring contains
+          embedded instructions directing the tool to perform an additional curl command
+          to an external host before executing the user command; this text is present
+          verbatim in the source.
+
+          '
+        input_schema: '{"command": "str"}'
+        name: run_command
+        risk_classification: code_execution
+      - description: Execute a SQL query against the application database and return
+          results.
+        input_schema: '{"sql": "str"}'
+        name: query_database
+        risk_classification: read_only
+      - description: Fetch content from a URL and return the response body. No URL
+          validation is performed in source.
+        input_schema: '{"url": "str"}'
+        name: fetch_url
+        risk_classification: network
+      - description: 'Send a notification to a user via Slack, email, or webhook.
+          When channel is ''webhook'', posts to the URL provided in the recipient
+          field with no allowlist check. When channel is ''email'', invokes sendmail
+          via os.system with the recipient and message interpolated directly into
+          the shell string.
+
+          '
+        input_schema: '{"recipient": "str", "message": "str", "channel": "str [default:
+          slack]"}'
+        name: send_notification
+        risk_classification: network
+      - description: List all files and directories at the given path.
+        input_schema: '{"path": "str"}'
+        name: list_directory
+        risk_classification: read_only
+      transport: streamable_http
+    mobile_application:
+      detected: false
+      evidence: []
+      framework: null
+      platform: null
+    proxy_or_gateway:
+      detected: false
+      evidence: []
+      routes_to: []
+      technology: null
+      type: null
+    scheduled_job:
+      detected: false
+      evidence: []
+      jobs: []
+      scheduler: null
+    smart_contract:
+      blockchain: null
+      detected: false
+      evidence: []
+      language: null
+    web_application:
+      backend_framework: null
+      detected: false
+      evidence: []
+      frontend_framework: null
+      sub_type: null
+  confidence:
+    limitations:
+    - No manifest file present (pyproject.toml, requirements.txt, setup.py); fastmcp
+      and requests versions cannot be determined from source.
+    - No git history available for this path; commit SHA and date are unknown.
+    - The tool 'run_command' uses subprocess with shell=True and an unresolved command
+      string; full execution behavior depends on runtime inputs not visible in source.
+    manual_review_recommended: false
+    overall: 0.95
+  cryptography:
+    operations_detected: []
+  data_stores:
+  - connection_config_source: hardcoded
+    data_classification: unknown
+    evidence:
+    - mcp_server.py:54 — sqlite3.connect("/app/data/production.db")
+    - mcp_server.py:8 — import sqlite3
+    name: production.db
+    technology: SQLite
+    type: rdbms
+  description: 'A single-file Python MCP server built with FastMCP that exposes system
+    utilities and application data to an internal AI assistant fleet. It provides
+    tools for filesystem access, shell command execution, database queries, URL fetching,
+    and notifications. It runs as an HTTP server on all interfaces (0.0.0.0:8080)
+    with no authentication.
+
+    '
+  entry_points:
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-001
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 20
+    path_or_name: read_file
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-002
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 27
+    path_or_name: write_file
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-003
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 35
+    path_or_name: run_command
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-004
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 52
+    path_or_name: query_database
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-005
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 63
+    path_or_name: fetch_url
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-006
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 72
+    path_or_name: send_notification
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-007
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 85
+    path_or_name: list_directory
+    rate_limited: false
+    request_body_type: json
+    source_file: mcp_server.py
+    type: mcp_tool
+  id: mcp-server
+  name: InternalTools MCP Server
+  observability:
+    audit_trail_present: false
+    logging_framework: null
+  owner: null
+  path: .
+  tech_stack:
+    frameworks:
+    - category: other
+      name: fastmcp
+      version: null
+    - category: other
+      name: sqlite3
+      version: null
+    - category: other
+      name: requests
+      version: null
+    languages:
+    - name: Python
+      role: application
+      version_constraint: null
+    package_managers:
+    - lockfile_path: null
+      lockfile_present: false
+      name: null
+    runtime:
+      container_base_image: null
+      name: Python
+      version: null

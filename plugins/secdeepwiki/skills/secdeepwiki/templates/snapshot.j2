@@ -1,0 +1,318 @@
+{%- set r = secdeepwiki -%}
+{%- set repo = r.repository -%}
+{%- set analysis = r.analysis -%}
+# SecDeepWiki — {{ repo.name or "Unknown Repository" }}
+
+> **Branch**: {{ repo.branch or "—" }} | **Commit**: `{{ (repo.commit_sha or "")[:12] or "—" }}` | **Date**: {{ repo.commit_date or "—" }}
+> **Mode**: {{ analysis.mode or "—" }} | **Generated**: {{ analysis.generated_at or "—" }} | **Confidence**: {{ ((analysis.overall_confidence or 0) * 100) | round | int }}%
+
+---
+
+## Repository Overview
+
+| Field | Value |
+|---|---|
+| URL | {{ repo.url or "—" }} |
+| Author | {{ repo.commit_author or "—" }} |
+| Commit message | {{ repo.commit_message or "—" }} |
+| Monorepo | {{ r.repo_structure.is_monorepo if r.repo_structure.is_monorepo is not none else "—" }} |
+| Languages | {{ r.repo_structure.languages_summary | map(attribute='language') | join(', ') if r.repo_structure.languages_summary else "—" }} |
+| Component types | {{ r.repo_structure.classifications_summary | join(', ') if r.repo_structure.classifications_summary else "—" }} |
+
+---
+
+## Attack Surface Summary
+
+{% set atk = r.cross_component.attack_surface if r.cross_component and r.cross_component.attack_surface else none %}
+{% if atk %}
+| Metric | Count |
+|---|---|
+| External entry points | {{ atk.total_external_entry_points or 0 }} |
+| Internal entry points | {{ atk.total_internal_entry_points or 0 }} |
+| Unauthenticated endpoints | {{ atk.unauthenticated_entry_points | length if atk.unauthenticated_entry_points else 0 }} |
+| File upload endpoints | {{ atk.file_upload_endpoints | length if atk.file_upload_endpoints else 0 }} |
+| Admin interfaces | {{ atk.admin_interfaces | length if atk.admin_interfaces else 0 }} |
+| Debug endpoints | {{ atk.debug_endpoints | length if atk.debug_endpoints else 0 }} |
+
+{% if atk.unauthenticated_entry_points %}
+### Unauthenticated Endpoints
+
+| Component | Path / Name |
+|---|---|
+{% for ep in atk.unauthenticated_entry_points %}
+| {{ ep.component }} | `{{ ep.path_or_name }}` |
+{% endfor %}
+{% endif %}
+
+{% if atk.file_upload_endpoints %}
+### File Upload Endpoints
+
+| Component | Path / Name |
+|---|---|
+{% for ep in atk.file_upload_endpoints %}
+| {{ ep.component }} | `{{ ep.path_or_name }}` |
+{% endfor %}
+{% endif %}
+
+{% if atk.admin_interfaces %}
+### Admin Interfaces
+
+| Component | Path / Name |
+|---|---|
+{% for ep in atk.admin_interfaces %}
+| {{ ep.component }} | `{{ ep.path_or_name }}` |
+{% endfor %}
+{% endif %}
+{% else %}
+*Attack surface not yet computed.*
+{% endif %}
+
+---
+
+## Component Inventory
+
+| ID | Name | Path | Types | Entry Points | Overall Confidence |
+|---|---|---|---|---|---|
+{% for comp in r.components %}
+{% set types = [] %}
+{% for ctype in ['web_application','api_service','ai_agent','mcp_server','cli_tool','library_or_sdk','infrastructure_as_code','event_consumer_or_worker','scheduled_job','proxy_or_gateway','smart_contract','mobile_application','browser_extension','data_pipeline','machine_learning_model','database_migration','fork_or_vendor_copy'] %}
+{% if comp.classification and comp.classification[ctype] and comp.classification[ctype].detected %}{% set _ = types.append(ctype) %}{% endif %}
+{% endfor %}
+| `{{ comp.id or "—" }}` | {{ comp.name or "—" }} | `{{ comp.path or "." }}` | {{ types | join(', ') or "unknown" }} | {{ comp.entry_points | length if comp.entry_points else 0 }} | {{ ((comp.confidence.overall or 0) * 100) | round | int }}% |
+{% endfor %}
+
+---
+
+{% for comp in r.components %}
+## Component: {{ comp.name or comp.id }}
+
+> {{ comp.description or "No description." }}
+
+**Owner**: {{ comp.owner or "—" }} | **Path**: `{{ comp.path or "." }}`
+
+{% if comp.confidence and comp.confidence.manual_review_recommended %}
+> ℹ️ Manual review recommended. Confidence: {{ ((comp.confidence.overall or 0) * 100) | round | int }}%
+{% if comp.confidence.limitations %}{% for lim in comp.confidence.limitations %}> - {{ lim }}
+{% endfor %}{% endif %}
+{% endif %}
+
+### Classification
+
+{% set types = [] %}
+{% for ctype in ['web_application','api_service','ai_agent','mcp_server','cli_tool','library_or_sdk','infrastructure_as_code','event_consumer_or_worker','scheduled_job','proxy_or_gateway','smart_contract','mobile_application','browser_extension','data_pipeline','machine_learning_model','database_migration','fork_or_vendor_copy'] %}
+{% if comp.classification and comp.classification[ctype] and comp.classification[ctype].detected %}{% set _ = types.append(ctype) %}{% endif %}
+{% endfor %}
+{% if types %}
+**Types detected**: {{ types | join(', ') }}
+
+{% if comp.classification.api_service and comp.classification.api_service.detected %}
+**API service**: style=`{{ comp.classification.api_service.style or "—" }}`, framework=`{{ comp.classification.api_service.framework or "—" }}`
+{% if comp.classification.api_service.spec_file and comp.classification.api_service.spec_file.present %}
+Spec file: `{{ comp.classification.api_service.spec_file.path or "—" }}` ({{ comp.classification.api_service.spec_file.format or "unknown format" }})
+{% else %}
+ℹ️ No API spec file detected.
+{% endif %}
+{% endif %}
+
+{% if comp.classification.ai_agent and comp.classification.ai_agent.detected %}
+**AI agent**: framework=`{{ comp.classification.ai_agent.framework or "—" }}`
+{% if comp.classification.ai_agent.models_referenced %}
+Models referenced:
+{% for m in comp.classification.ai_agent.models_referenced %}
+- `{{ m.provider }}/{{ m.model_id }}` — API key from: **{{ m.api_key_source }}**
+
+{% endfor %}
+{% endif %}
+{% if comp.classification.ai_agent.tools_defined %}
+Tools defined:
+{% for t in comp.classification.ai_agent.tools_defined %}
+- **{{ t.name }}** ({{ t.risk_surface }}): {{ t.description }}
+{% endfor %}
+{% endif %}
+RAG: {{ comp.classification.ai_agent.rag_detected }} | Memory: {{ comp.classification.ai_agent.memory_mechanism or "—" }} | Guardrails: {{ comp.classification.ai_agent.guardrails_present }}
+{% endif %}
+
+{% if comp.classification.mcp_server and comp.classification.mcp_server.detected %}
+**MCP server**: framework=`{{ comp.classification.mcp_server.framework or "—" }}`, transport=`{{ comp.classification.mcp_server.transport or "—" }}`, auth=`{{ comp.classification.mcp_server.authentication or "none" }}`
+{% if comp.classification.mcp_server.tools %}
+Tools:
+| Name | Risk | Description |
+|---|---|---|
+{% for t in comp.classification.mcp_server.tools %}
+| `{{ t.name }}` | **{{ t.risk_classification | upper }}** | {{ t.description or "—" }} |
+{% endfor %}
+{% endif %}
+{% endif %}
+{% else %}
+*No classification detected.*
+{% endif %}
+
+### Tech Stack
+
+{% if comp.tech_stack %}
+**Languages**: {{ comp.tech_stack.languages | map(attribute='name') | join(', ') if comp.tech_stack.languages else "—" }}
+
+{% if comp.tech_stack.frameworks %}
+**Frameworks**:
+{% for fw in comp.tech_stack.frameworks %}
+- {{ fw.name }} {{ fw.version or "" }} ({{ fw.category }})
+{% endfor %}
+{% endif %}
+
+{% if comp.tech_stack.runtime and comp.tech_stack.runtime.name %}
+**Runtime**: {{ comp.tech_stack.runtime.name }} {{ comp.tech_stack.runtime.version or "" }}
+{% if comp.tech_stack.runtime.container_base_image %}Base image: `{{ comp.tech_stack.runtime.container_base_image }}`{% endif %}
+{% endif %}
+{% else %}
+*Tech stack not analyzed.*
+{% endif %}
+
+### Entry Points
+
+{% if comp.entry_points %}
+| ID | Type | Path / Name | Method | Auth Required | Input Validation | File Upload |
+|---|---|---|---|---|---|---|
+{% for ep in comp.entry_points %}
+| {{ ep.id or "—" }} | `{{ ep.type }}` | `{{ ep.path_or_name or "—" }}` | {{ ep.http_method or "—" }} | {{ ep.authentication_required or "—" }} | {{ ep.input_validation.present if ep.input_validation else false }} | {{ ep.file_upload_accepted or false }} |
+{% endfor %}
+{% else %}
+*No entry points detected.*
+{% endif %}
+
+### Authentication
+
+{% if comp.authentication %}
+{% if comp.authentication.mechanisms %}
+| Type | Provider | Config Source | Token Storage | MFA Enforced |
+|---|---|---|---|---|
+{% for m in comp.authentication.mechanisms %}
+| `{{ m.type }}` | {{ m.provider or "—" }} | {{ m.configuration_source or "—" }} | {{ m.token_storage or "—" }} | {{ m.mfa_enforced or false }} |
+{% endfor %}
+{% else %}
+*No authentication mechanisms detected.*
+{% endif %}
+
+{% if comp.authentication.session_management and comp.authentication.session_management.mechanism %}
+**Session management**: {{ comp.authentication.session_management.mechanism }} (store: {{ comp.authentication.session_management.session_store or "unknown" }})
+{% else %}
+ℹ️ Session management not detected in source. See open questions.
+{% endif %}
+
+{% if comp.authentication.credential_storage %}
+**Credential storage**: hashing=`{{ comp.authentication.credential_storage.password_hashing }}`
+{% endif %}
+
+**Service-to-service auth**: {{ comp.authentication.service_to_service_auth.mechanism or "not detected" }}
+{% if not comp.authentication.service_to_service_auth.detected %}
+ℹ️ May be handled by service mesh. See open questions.
+{% endif %}
+{% else %}
+*Authentication not analyzed.*
+{% endif %}
+
+### Authorization
+
+{% if comp.authorization and comp.authorization.model %}
+**Model**: {{ comp.authorization.model }} | **Framework**: {{ comp.authorization.framework or "—" }} | **Policy**: {{ comp.authorization.policy_location or "—" }}
+
+{% if comp.authorization.enforcement_points %}
+**Enforcement points**:
+{% for ep in comp.authorization.enforcement_points %}
+- `{{ ep.location }}` — coverage: **{{ ep.coverage }}**
+
+{% endfor %}
+{% endif %}
+{% else %}
+*Authorization model not detected.*
+{% endif %}
+
+### Cryptography
+
+{% if comp.cryptography and comp.cryptography.operations_detected %}
+| Operation | Algorithm | Library | Location |
+|---|---|---|---|
+{% for op in comp.cryptography.operations_detected %}
+| {{ op.operation }} | `{{ op.algorithm }}` | {{ op.library or "—" }} | `{{ op.file }}:{{ op.line }}` |
+{% endfor %}
+{% else %}
+*No cryptographic operations detected.*
+{% endif %}
+
+### Observability
+
+{% if comp.observability %}
+- **Logging framework**: {{ comp.observability.logging_framework or "not detected" }}
+- **Audit trail present**: {{ comp.observability.audit_trail_present or false }}
+{% else %}
+*Observability not analyzed.*
+{% endif %}
+
+### Data Stores
+
+{% if comp.data_stores %}
+| Type | Technology | Config Source | Data Classification |
+|---|---|---|---|
+{% for ds in comp.data_stores %}
+| {{ ds.type }} | {{ ds.technology or "—" }} | {{ ds.connection_config_source or "—" }} | {{ ds.data_classification or "—" }} |
+{% endfor %}
+{% else %}
+*No data stores detected.*
+{% endif %}
+
+---
+{% endfor %}
+
+## Data Flow Diagrams
+
+{% set dfds = r.cross_component.data_flow_diagrams if r.cross_component and r.cross_component.data_flow_diagrams else [] %}
+{% if dfds %}
+{% for dfd in dfds %}
+### {{ dfd.level | capitalize }} DFD
+
+{% if dfd.mermaid %}
+```mermaid
+{{ dfd.mermaid }}
+```
+{% else %}
+*Mermaid diagram not yet generated.*
+{% endif %}
+{% endfor %}
+{% else %}
+*Data flow diagrams not yet generated.*
+{% endif %}
+
+---
+
+## CI/CD Security Gates
+
+{% if r.shared and r.shared.ci_cd %}
+**Platform**: {{ r.shared.ci_cd.platform or "—" }}
+
+| Gate | Enabled |
+|---|---|
+| SAST | {{ r.shared.ci_cd.security_gates.sast or false }} |
+| DAST | {{ r.shared.ci_cd.security_gates.dast or false }} |
+| Secret scan | {{ r.shared.ci_cd.security_gates.secret_scan or false }} |
+| Code review required | {{ r.shared.ci_cd.security_gates.code_review_required or false }} |
+{% else %}
+*CI/CD not analyzed.*
+{% endif %}
+
+---
+
+## Component Relationships
+
+{% set rels = r.cross_component.relationships if r.cross_component and r.cross_component.relationships else [] %}
+{% if rels %}
+| Source | Type | Target | Protocol | Auth | Data Class | Trust Boundary |
+|---|---|---|---|---|---|---|
+{% for rel in rels %}
+| {{ rel.source }} | `{{ rel.type }}` | {{ rel.target }} | {{ rel.protocol or "—" }} | {{ rel.authentication or "—" }} | {{ rel.data_classification or "—" }} | {{ rel.trust_boundary_crossing or false }} |
+{% endfor %}
+{% else %}
+*Cross-component relationships not analyzed.*
+{% endif %}
+
+---
+
+*Generated by SecDeepWiki v{{ secdeepwiki.schema_version }} | [snapshot.yaml](snapshot.yaml)*

@@ -1,0 +1,221 @@
+component:
+  analysis_provenance:
+    carried_forward_reason: null
+    from_commit_sha: null
+    from_snapshot_id: null
+    modules_rerun:
+    - classify
+    - stack-analyze
+    - entry-point-scan
+    - auth-analyze
+    - crypto-analyze
+    - observability-scan
+    - data-store-detect
+    - confidence-compute
+    source: fresh_analysis
+  authentication:
+    credential_storage: null
+    mechanisms:
+    - configuration_source: null
+      evidence:
+      - 'skills/sec-vuln-triage/SKILL.md: no authentication defined; access delegated
+        to Claude Code harness'
+      mfa_enforced: false
+      provider: null
+      token_storage: none
+      type: none
+    service_to_service_auth:
+      detected: false
+      evidence: []
+      mechanism: none
+    session_management:
+      mechanism: none
+      session_store: none
+  authorization:
+    api_key_management:
+      revocation_supported: false
+      rotation_supported: false
+      scoping: null
+    enforcement_points: []
+    framework: null
+    model: none
+    policy_location: null
+    resource_types: []
+  classification:
+    ai_agent:
+      detected: true
+      evidence:
+      - 'skills/sec-vuln-triage/SKILL.md: multi-round triage with arbiter; behavioral
+        contract for untrusted source'
+      - 'skills/sec-vuln-triage/SKILL.md: tools list (read_file, search_code, trace_callers)'
+      framework: custom
+      guardrails_present: true
+      memory_mechanism: file_system
+      models_referenced:
+      - api_key_source: null
+        model_id: null
+        provider: anthropic
+      rag_detected: false
+      tools_defined:
+      - description: Read file content at the reported vulnerability location (±30
+          lines)
+        name: read_file
+        risk_surface: file_access
+      - description: Run ripgrep to verify evidence cited in the finding
+        name: search_code
+        risk_surface: file_access
+      - description: Walk the call graph backward to verify reachability
+        name: trace_callers
+        risk_surface: file_access
+    api_service:
+      detected: false
+      evidence: []
+      framework: null
+      spec_file:
+        format: null
+        path: null
+        present: false
+      style: null
+    browser_extension:
+      detected: false
+      evidence: []
+      manifest_version: null
+      permissions_requested: []
+      target_browsers: []
+    cli_tool:
+      commands: []
+      detected: false
+      entry_point: null
+      evidence: []
+      framework: null
+    data_pipeline:
+      detected: false
+      evidence: []
+      framework: null
+    database_migration:
+      database_type: null
+      detected: false
+      evidence: []
+      migration_framework: null
+      pii_columns_detected: []
+    event_consumer_or_worker:
+      detected: false
+      event_sources: []
+      evidence: []
+      processing_model: null
+      queue_technology: null
+    fork_or_vendor_copy:
+      detected: false
+      evidence: []
+      local_modifications: false
+      upstream_commit: null
+      upstream_url: null
+    infrastructure_as_code:
+      detected: false
+      evidence: []
+      frameworks: []
+    library_or_sdk:
+      detected: false
+      evidence: []
+      package_registry: null
+    machine_learning_model:
+      detected: false
+      evidence: []
+      inference_server: false
+      ml_framework: null
+      training_pipeline: false
+    mcp_server:
+      authentication: null
+      detected: false
+      evidence: []
+      framework: null
+      prompts: []
+      resources: []
+      tools: []
+      transport: null
+    mobile_application:
+      detected: false
+      evidence: []
+      framework: null
+      platform: null
+    proxy_or_gateway:
+      detected: false
+      evidence: []
+      routes_to: []
+      technology: null
+      type: null
+    scheduled_job:
+      detected: false
+      evidence: []
+      jobs: []
+      scheduler: null
+    smart_contract:
+      blockchain: null
+      detected: false
+      evidence: []
+      language: null
+    web_application:
+      backend_framework: null
+      detected: false
+      evidence: []
+      frontend_framework: null
+      sub_type: null
+  confidence:
+    limitations:
+    - Skill contains only SKILL.md — behavior is fully determined at LLM runtime,
+      not statically analyzable.
+    - Authentication delegated to Claude Code harness; not visible in this component.
+    manual_review_recommended: false
+    overall: 0.85
+  cryptography:
+    operations_detected: []
+  data_stores:
+  - connection_config_source: null
+    data_classification: internal
+    evidence:
+    - 'skills/sec-vuln-triage/SKILL.md: writes triage/T<seq>_<slug>.md and rejected.jsonl'
+    name: triage session directory
+    technology: local file system
+    type: file_system
+  description: 'Adversarial multi-round triage verifier. Accepts a vulnerability finding
+    (JSON dict, CVE description, or bug report), independently challenges it across
+    four axes (Real, Triggerable, Impactful, Novel) over N rounds plus an arbiter
+    round, and emits a confidence-scored verdict (VALID / INVALID / UNCERTAIN). Can
+    be invoked automatically by sec-vuln-research or as a standalone skill. Contains
+    only a SKILL.md with no executable scripts.
+
+    '
+  entry_points:
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-004
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 1
+    path_or_name: sec-vuln-triage (SKILL.md)
+    rate_limited: false
+    request_body_type: none
+    source_file: skills/sec-vuln-triage/SKILL.md
+    type: plugin_hook
+  id: sec-vuln-triage-skill
+  name: sec-vuln-triage Skill
+  observability:
+    audit_trail_present: false
+    logging_framework: null
+  owner: null
+  path: skills/sec-vuln-triage
+  tech_stack:
+    frameworks: []
+    languages:
+    - name: Markdown
+      role: scripting
+      version_constraint: null
+    package_managers: []
+    runtime:
+      container_base_image: null
+      name: null
+      version: null

@@ -1,0 +1,1509 @@
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  snapshot:
+    id: "secdeepwiki-sec-vuln-research-cfe609975c7a806b7cc2b9ec3f616ed460e9878c-3.0.0"
+
+  repository:
+    url: null                          # local path only; no remote URL detected
+    name: "sec-vuln-research"
+    branch: "FEAT/Add-Sec-Vuln-Discovery"
+    commit_sha: "cfe609975c7a806b7cc2b9ec3f616ed460e9878c"
+    commit_date: "2026-06-02T07:14:51-04:00"
+    commit_author: "hecber@gmail.com"
+    commit_message: "FEATURE | Add sec vuln discovery (#8)"
+
+  analysis:
+    generated_at: "2026-06-03T00:00:00Z"
+    duration_seconds: null
+    mode: full
+    analyzer_version: "secdeepwiki-3.0.0"
+    modules_executed:
+      - repo-scan
+      - component-detect
+      - classify
+      - stack-analyze
+      - entry-point-scan
+      - auth-analyze
+      - crypto-analyze
+      - observability-scan
+      - data-store-detect
+      - confidence-compute
+      - cicd-analyze
+      - relationship-map
+      - dfd-generate
+      - attack-surface-aggregate
+    modules_skipped: []
+    llm_assisted_modules:
+      - classify
+      - entry-point-scan
+      - auth-analyze
+      - data-store-detect
+    overall_confidence: 0.82
+
+  previous_snapshot: null
+
+  # ---------------------------------------------------------------------------
+  # §6 Repository Structure
+  # ---------------------------------------------------------------------------
+  repo_structure:
+    is_monorepo: false
+    languages_summary:
+      - language: Python
+      - language: Markdown
+      - language: YAML
+      - language: Jinja2
+    classifications_summary:
+      - agent_skill_plugin
+      - cli_tool
+      - library_or_sdk
+
+  # ---------------------------------------------------------------------------
+  # §7 Shared Analysis
+  # ---------------------------------------------------------------------------
+  shared:
+    ci_cd:
+      platform: none
+      security_gates:
+        sast: false
+        dast: false
+        secret_scan: false
+        code_review_required: false
+
+  # ---------------------------------------------------------------------------
+  # §8 Components
+  # ---------------------------------------------------------------------------
+  components:
+
+    # -------------------------------------------------------------------------
+    # Component 1 — Plugin Root
+    # -------------------------------------------------------------------------
+    - id: sec-vuln-research-plugin
+      name: "sec-vuln-research Plugin"
+      path: "."
+      description: >
+        Top-level Claude Code agent plugin that packages three coordinated security
+        skills (sec-vuln-research, sec-vuln-triage, sec-attack-chain) under a single
+        plugin manifest. Provides no executable code at this level; its role is to
+        register skill metadata with the Claude Code harness and supply shared
+        documentation.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: false
+          framework: null
+          models_referenced: []
+          tools_defined: []
+          rag_detected: false
+          memory_mechanism: none
+          guardrails_present: false
+          evidence: []
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []
+          evidence: []
+
+        library_or_sdk:
+          detected: true
+          package_registry: null        # distributed as a Claude Code plugin, not a package registry artifact
+          evidence:
+            - ".claude-plugin/plugin.json: plugin manifest with name, version, description, author fields"
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: null
+            version_constraint: null
+            role: infrastructure
+        package_managers: []
+        frameworks: []
+        runtime:
+          name: null
+          version: null
+          container_base_image: null
+
+      entry_points: []
+
+      authentication:
+        mechanisms: []
+        session_management:
+          mechanism: none
+          session_store: none
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence: []
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points: []
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []
+
+      observability:
+        logging_framework: null
+        audit_trail_present: false
+
+      data_stores: []
+
+      confidence:
+        overall: 0.90
+        manual_review_recommended: false
+        limitations:
+          - "Plugin root contains only manifest JSON and README — no executable code to analyze at this level."
+
+    # -------------------------------------------------------------------------
+    # Component 2 — sec-vuln-research skill
+    # -------------------------------------------------------------------------
+    - id: sec-vuln-research-skill
+      name: "sec-vuln-research Skill"
+      path: "skills/sec-vuln-research"
+      description: >
+        Multi-stage LLM-driven vulnerability research pipeline orchestrator. Coordinates
+        eight stages (graph build via trailmark, file ranking, context generation, four
+        specialist hunters, adversarial triage, variant analysis, attack chain generation,
+        and report production). Contains the analyze.py ingest script, render_report.py
+        renderer, a Jinja2 report template, and a YAML report template. This is the primary
+        entry point for the plugin's vulnerability-finding capability.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: true
+          framework: custom           # LLM orchestration is prompt/instruction-driven via SKILL.md; no LangChain/etc.
+          models_referenced:
+            - provider: anthropic
+              model_id: null          # model selection delegated to Claude Code harness; not hardcoded
+              api_key_source: null    # API key managed by Claude Code harness, not by this plugin
+          tools_defined:
+            - name: read_file
+              description: "Read source file content at a given path"
+              risk_surface: file_access
+            - name: search_code
+              description: "Run ripgrep pattern search across the target repository"
+              risk_surface: file_access
+            - name: resolve_symbol
+              description: "Resolve a named constant to its numeric value"
+              risk_surface: file_access
+            - name: trace_callers
+              description: "Walk backward from a function to find its callers"
+              risk_surface: file_access
+            - name: trace_callees
+              description: "Walk forward from a function to find its callees"
+              risk_surface: file_access
+          rag_detected: false
+          memory_mechanism: file_system   # session directory (vuln-research-report.yaml, findings, context/) persists state across stages
+          guardrails_present: true         # untrusted-source posture declared in SKILL.md behavioral contract
+          evidence:
+            - "skills/sec-vuln-research/SKILL.md: multi-stage LLM orchestration with specialist agents"
+            - "skills/sec-vuln-research/SKILL.md: tools_defined list (read_file, search_code, resolve_symbol, trace_callers, trace_callees)"
+            - "skills/sec-vuln-research/SKILL.md: memory_mechanism = file_system (session directory)"
+            - "skills/sec-vuln-research/SKILL.md: behavioral contract — untrusted source posture"
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: true
+          framework: argparse
+          entry_point: "skills/sec-vuln-research/scripts/analyze.py"
+          commands:
+            - name: analyze
+              description: "Stage 0 ingestion — build trailmark CodeGraph for target directory, run pre-analysis passes, write ingest_graph.json"
+              accepts_file_input: false
+              accepts_url_input: false
+            - name: render_report
+              description: "Render a filled vuln-research-report.yaml into a Markdown report"
+              accepts_file_input: true    # yaml_file positional argument
+              accepts_url_input: false
+          evidence:
+            - "skills/sec-vuln-research/scripts/analyze.py: argparse-based CLI with positional <target_path> and --output / --sarif flags"
+            - "skills/sec-vuln-research/scripts/render_report.py: argparse-based CLI with yaml_file positional and --output flag"
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Python
+            version_constraint: ">=3.12"    # from analyze.py PEP 723 inline metadata
+            role: application
+          - name: Python
+            version_constraint: ">=3.11"    # from render_report.py PEP 723 inline metadata
+            role: application
+          - name: Markdown
+            version_constraint: null
+            role: scripting
+          - name: YAML
+            version_constraint: null
+            role: scripting
+          - name: Jinja2
+            version_constraint: null
+            role: scripting
+
+        package_managers:
+          - name: uv
+            lockfile_present: false
+            lockfile_path: null             # scripts use PEP 723 inline metadata; no project-level pyproject.toml
+
+        frameworks:
+          - name: trailmark
+            version: ">=0.1"
+            category: security
+          - name: jinja2
+            version: ">=3.1"
+            category: other
+          - name: pyyaml
+            version: ">=6.0"
+            category: other
+
+        runtime:
+          name: Python
+          version: ">=3.11"
+          container_base_image: null
+
+      entry_points:
+        - id: EP-001
+          type: cli_command
+          path_or_name: "analyze.py <target_path> --output <path> [--sarif <path>]"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: true
+            framework: argparse
+            schema_path: "skills/sec-vuln-research/scripts/analyze.py"
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: "skills/sec-vuln-research/scripts/analyze.py"
+          line_number: 289
+
+        - id: EP-002
+          type: cli_command
+          path_or_name: "render_report.py <yaml_file> [--output <path>]"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: true
+            framework: argparse
+            schema_path: "skills/sec-vuln-research/scripts/render_report.py"
+          rate_limited: false
+          file_upload_accepted: true      # accepts a YAML file path as input
+          request_body_type: none
+          source_file: "skills/sec-vuln-research/scripts/render_report.py"
+          line_number: 53
+
+        - id: EP-003
+          type: plugin_hook
+          path_or_name: "sec-vuln-research (SKILL.md)"
+          http_method: null
+          authentication_required: no     # invoked by Claude Code harness; no independent auth gate
+          authorization_model: none
+          input_validation:
+            present: false                # inputs are natural-language prompts parsed by LLM; no schema validation
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: "skills/sec-vuln-research/SKILL.md"
+          line_number: 1
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "skills/sec-vuln-research/SKILL.md: no authentication defined for skill invocation; access control is delegated to Claude Code harness"
+        session_management:
+          mechanism: none
+          session_store: none
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence:
+            - "scripts/analyze.py: no outbound authenticated HTTP calls; reads local filesystem only"
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points: []
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []           # no crypto library imports detected in scripts/
+
+      observability:
+        logging_framework: null           # scripts use print() statements to stdout; no structured logging framework
+        audit_trail_present: false
+
+      data_stores:
+        - type: file_system
+          technology: "local file system"
+          name: "session directory"
+          connection_config_source: null   # path provided as CLI argument; no environment variable or config file
+          data_classification: internal
+          evidence:
+            - "skills/sec-vuln-research/scripts/analyze.py: writes ingest_graph.json to --output path"
+            - "skills/sec-vuln-research/scripts/render_report.py: reads yaml_file, writes .md alongside it"
+            - "skills/sec-vuln-research/references/session-schema.md: full session directory layout"
+
+      confidence:
+        overall: 0.82
+        manual_review_recommended: false
+        limitations:
+          - "Authentication and authorization for skill invocation are provided by the Claude Code harness, which is not part of this repository — auth enforcement is Tier 2."
+          - "The skill orchestrates LLM calls whose behavior is determined at runtime by the harness; the static SKILL.md file describes intended behavior but not the actual LLM invocation code."
+
+    # -------------------------------------------------------------------------
+    # Component 3 — sec-vuln-triage skill
+    # -------------------------------------------------------------------------
+    - id: sec-vuln-triage-skill
+      name: "sec-vuln-triage Skill"
+      path: "skills/sec-vuln-triage"
+      description: >
+        Adversarial multi-round triage verifier. Accepts a vulnerability finding (JSON dict,
+        CVE description, or bug report), independently challenges it across four axes (Real,
+        Triggerable, Impactful, Novel) over N rounds plus an arbiter round, and emits a
+        confidence-scored verdict (VALID / INVALID / UNCERTAIN). Can be invoked automatically
+        by sec-vuln-research or as a standalone skill. Contains only a SKILL.md with no
+        executable scripts.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: true
+          framework: custom
+          models_referenced:
+            - provider: anthropic
+              model_id: null
+              api_key_source: null
+          tools_defined:
+            - name: read_file
+              description: "Read file content at the reported vulnerability location (±30 lines)"
+              risk_surface: file_access
+            - name: search_code
+              description: "Run ripgrep to verify evidence cited in the finding"
+              risk_surface: file_access
+            - name: trace_callers
+              description: "Walk the call graph backward to verify reachability"
+              risk_surface: file_access
+          rag_detected: false
+          memory_mechanism: file_system   # writes triage/<slug>.md and rejected.jsonl per session
+          guardrails_present: true
+          evidence:
+            - "skills/sec-vuln-triage/SKILL.md: multi-round triage with arbiter; behavioral contract for untrusted source"
+            - "skills/sec-vuln-triage/SKILL.md: tools list (read_file, search_code, trace_callers)"
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []
+          evidence: []
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Markdown
+            version_constraint: null
+            role: scripting
+        package_managers: []
+        frameworks: []
+        runtime:
+          name: null
+          version: null
+          container_base_image: null
+
+      entry_points:
+        - id: EP-004
+          type: plugin_hook
+          path_or_name: "sec-vuln-triage (SKILL.md)"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: "skills/sec-vuln-triage/SKILL.md"
+          line_number: 1
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "skills/sec-vuln-triage/SKILL.md: no authentication defined; access delegated to Claude Code harness"
+        session_management:
+          mechanism: none
+          session_store: none
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence: []
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points: []
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []
+
+      observability:
+        logging_framework: null
+        audit_trail_present: false
+
+      data_stores:
+        - type: file_system
+          technology: "local file system"
+          name: "triage session directory"
+          connection_config_source: null
+          data_classification: internal
+          evidence:
+            - "skills/sec-vuln-triage/SKILL.md: writes triage/T<seq>_<slug>.md and rejected.jsonl"
+
+      confidence:
+        overall: 0.85
+        manual_review_recommended: false
+        limitations:
+          - "Skill contains only SKILL.md — behavior is fully determined at LLM runtime, not statically analyzable."
+          - "Authentication delegated to Claude Code harness; not visible in this component."
+
+    # -------------------------------------------------------------------------
+    # Component 4 — sec-attack-chain skill
+    # -------------------------------------------------------------------------
+    - id: sec-attack-chain-skill
+      name: "sec-attack-chain Skill"
+      path: "skills/sec-attack-chain"
+      description: >
+        Generates structured attack chain documents for confirmed security vulnerabilities.
+        Traces the real entry point backward through the call graph (using trailmark graph
+        data when available, grep-based tracing as fallback), documents exploitation steps,
+        assesses severity on four dimensions, and writes a functional PoC skeleton. Produces
+        a Markdown attack chain document and populates the attack_chain block in the YAML
+        report. Contains SKILL.md and an attack chain Markdown template; no executable scripts.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: true
+          framework: custom
+          models_referenced:
+            - provider: anthropic
+              model_id: null
+              api_key_source: null
+          tools_defined:
+            - name: read_file
+              description: "Read the full function containing the vulnerability and surrounding context"
+              risk_surface: file_access
+            - name: trace_callers
+              description: "Walk backward from the vulnerable function to find public entry points"
+              risk_surface: file_access
+            - name: resolve_symbol
+              description: "Resolve named constants (buffer sizes, limits) to numeric values"
+              risk_surface: file_access
+            - name: engine_entrypoint_paths_to
+              description: "Use trailmark graph to enumerate all paths from attack surface to vulnerable function"
+              risk_surface: file_access
+          rag_detected: false
+          memory_mechanism: file_system   # writes attack-chains/VULN-NNN_<slug>.md per finding
+          guardrails_present: true
+          evidence:
+            - "skills/sec-attack-chain/SKILL.md: tool list (read_file, trace_callers, resolve_symbol, engine.entrypoint_paths_to)"
+            - "skills/sec-attack-chain/SKILL.md: behavioral contract — no weaponized exploits; PoC stops at triggerable demonstration"
+            - "skills/sec-attack-chain/SKILL.md: untrusted source posture"
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []
+          evidence: []
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Markdown
+            version_constraint: null
+            role: scripting
+        package_managers: []
+        frameworks: []
+        runtime:
+          name: null
+          version: null
+          container_base_image: null
+
+      entry_points:
+        - id: EP-005
+          type: plugin_hook
+          path_or_name: "sec-attack-chain (SKILL.md)"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: "skills/sec-attack-chain/SKILL.md"
+          line_number: 1
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "skills/sec-attack-chain/SKILL.md: no authentication defined; access delegated to Claude Code harness"
+        session_management:
+          mechanism: none
+          session_store: none
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence: []
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points: []
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []
+
+      observability:
+        logging_framework: null
+        audit_trail_present: false
+
+      data_stores:
+        - type: file_system
+          technology: "local file system"
+          name: "attack chain session directory"
+          connection_config_source: null
+          data_classification: internal
+          evidence:
+            - "skills/sec-attack-chain/SKILL.md: writes attack-chains/VULN-NNN_<file_slug>_<type>.md"
+
+      confidence:
+        overall: 0.85
+        manual_review_recommended: false
+        limitations:
+          - "Skill contains only SKILL.md and a template — behavior is fully determined at LLM runtime."
+          - "Authentication delegated to Claude Code harness; not visible in this component."
+
+  # ---------------------------------------------------------------------------
+  # §9 Cross-Component Analysis
+  # ---------------------------------------------------------------------------
+  cross_component:
+    relationships:
+      - source: sec-vuln-research-skill
+        target: sec-vuln-triage-skill
+        type: calls_api             # sec-vuln-research invokes sec-vuln-triage for each hunter_confirmed finding
+        protocol: "skill invocation (Claude Code harness)"
+        authentication: none
+        data_classification: internal
+        trust_boundary_crossing: false
+
+      - source: sec-vuln-research-skill
+        target: sec-attack-chain-skill
+        type: calls_api             # sec-vuln-research invokes sec-attack-chain for independently_verified findings
+        protocol: "skill invocation (Claude Code harness)"
+        authentication: none
+        data_classification: internal
+        trust_boundary_crossing: false
+
+      - source: sec-vuln-research-skill
+        target: sec-vuln-research-skill
+        type: reads_from_store      # all three skills share the same session directory (ingest_graph.json, vuln-research-report.yaml)
+        protocol: "local file system"
+        authentication: none
+        data_classification: internal
+        trust_boundary_crossing: false
+
+      - source: sec-vuln-triage-skill
+        target: sec-vuln-research-skill
+        type: writes_to_store       # triage writes triage/ and rejected.jsonl back into the shared session directory
+        protocol: "local file system"
+        authentication: none
+        data_classification: internal
+        trust_boundary_crossing: false
+
+      - source: sec-attack-chain-skill
+        target: sec-vuln-research-skill
+        type: writes_to_store       # attack chain writes attack-chains/ back into the shared session directory
+        protocol: "local file system"
+        authentication: none
+        data_classification: internal
+        trust_boundary_crossing: false
+
+    data_flow_diagrams:
+      - level: context
+        actors:
+          - id: A1
+            name: "Security Researcher / Pentester"
+            type: internal_user
+            trust_level: trusted
+
+          - id: A2
+            name: "Claude Code Harness"
+            type: system
+            trust_level: highly_trusted
+
+          - id: A3
+            name: "Target Repository (untrusted source)"
+            type: third_party_service
+            trust_level: untrusted
+
+        processes:
+          - id: P1
+            name: "sec-vuln-research Pipeline"
+            component_ref: sec-vuln-research-skill
+            trust_zone: "skill execution environment"
+            technology: "LLM + Python scripts"
+
+        data_stores:
+          - id: DS1
+            name: "Session Directory"
+            type: file_system
+            data_classification: internal
+
+        data_flows:
+          - id: DF1
+            source: A1
+            destination: P1
+            data_description: "Scan request: target path, mode, depth, budget config"
+            data_classification: internal
+            protocol: "skill invocation via Claude Code"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF2
+            source: P1
+            destination: A3
+            data_description: "Read-only filesystem access to target repository source files"
+            data_classification: unknown       # content of the target repo is not known until runtime
+            protocol: "local file system"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "trusted skill environment → untrusted target repository"
+
+          - id: DF3
+            source: P1
+            destination: DS1
+            data_description: "ingest_graph.json, vuln-research-report.yaml, findings, triage, attack-chains"
+            data_classification: internal
+            protocol: "local file system"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF4
+            source: P1
+            destination: A1
+            data_description: "Rendered vulnerability research report (Markdown + YAML)"
+            data_classification: internal
+            protocol: "file system / stdout"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+        trust_boundaries:
+          - id: TB1
+            name: "Skill Execution Environment"
+            type: process
+            contains: [P1, DS1]
+
+          - id: TB2
+            name: "Target Repository Boundary"
+            type: third_party
+            contains: [A3]
+
+        mermaid: |
+          graph LR
+            A1([Security Researcher]) -->|scan request| P1[sec-vuln-research Pipeline]
+            P1 -->|read-only file access| A3([Target Repository\nuntrusted])
+            P1 -->|writes artifacts| DS1[(Session Directory)]
+            DS1 -->|reads shared state| P1
+            P1 -->|rendered report| A1
+
+            subgraph TB1[Skill Execution Environment]
+              P1
+              DS1
+            end
+
+      - level: container
+        actors:
+          - id: A1
+            name: "Security Researcher / Pentester"
+            type: internal_user
+            trust_level: trusted
+
+          - id: A2
+            name: "Claude Code Harness"
+            type: system
+            trust_level: highly_trusted
+
+          - id: A3
+            name: "Target Repository (untrusted)"
+            type: third_party_service
+            trust_level: untrusted
+
+        processes:
+          - id: P1
+            name: "sec-vuln-research (orchestrator)"
+            component_ref: sec-vuln-research-skill
+            trust_zone: "skill execution"
+            technology: "LLM + Python (analyze.py, render_report.py)"
+
+          - id: P2
+            name: "sec-vuln-triage (verifier)"
+            component_ref: sec-vuln-triage-skill
+            trust_zone: "skill execution"
+            technology: "LLM"
+
+          - id: P3
+            name: "sec-attack-chain (chain generator)"
+            component_ref: sec-attack-chain-skill
+            trust_zone: "skill execution"
+            technology: "LLM"
+
+          - id: P4
+            name: "analyze.py (graph ingest script)"
+            component_ref: sec-vuln-research-skill
+            trust_zone: "skill execution"
+            technology: "Python / trailmark"
+
+          - id: P5
+            name: "render_report.py (Markdown renderer)"
+            component_ref: sec-vuln-research-skill
+            trust_zone: "skill execution"
+            technology: "Python / Jinja2 / PyYAML"
+
+        data_stores:
+          - id: DS1
+            name: "ingest_graph.json"
+            type: file_system
+            data_classification: internal
+
+          - id: DS2
+            name: "vuln-research-report.yaml"
+            type: file_system
+            data_classification: internal
+
+          - id: DS3
+            name: "triage/, attack-chains/, context/, rejected.jsonl"
+            type: file_system
+            data_classification: internal
+
+        data_flows:
+          - id: DF1
+            source: A1
+            destination: A2
+            data_description: "User prompt: sec-vuln-research invocation with target path and config"
+            data_classification: internal
+            protocol: "Claude Code harness"
+            encryption_in_transit: unknown
+            authentication: unknown
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF2
+            source: A2
+            destination: P1
+            data_description: "Skill activation with confirmed scope parameters"
+            data_classification: internal
+            protocol: "skill invocation"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF3
+            source: P1
+            destination: P4
+            data_description: "target_path, --output path, optional --sarif path"
+            data_classification: internal
+            protocol: "subprocess / uv run"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF4
+            source: P4
+            destination: A3
+            data_description: "Read source files for graph building (trailmark or fallback heuristic)"
+            data_classification: unknown
+            protocol: "local file system (read-only)"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "skill execution → untrusted target repository"
+
+          - id: DF5
+            source: P4
+            destination: DS1
+            data_description: "ingest_graph.json — full code graph with per-file metrics and pre-analysis flags"
+            data_classification: internal
+            protocol: "file system write"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF6
+            source: DS1
+            destination: P1
+            data_description: "Per-file blast_radius_rank, entrypoint_distance, taint/privilege flags for ranking and context generation"
+            data_classification: internal
+            protocol: "file system read"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF7
+            source: P1
+            destination: P2
+            data_description: "finding dict (file, line range, taint_source, taint_sink, cwe, precondition) — hunter reasoning NOT included"
+            data_classification: internal
+            protocol: "skill invocation"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF8
+            source: P2
+            destination: DS3
+            data_description: "triage/<slug>.md (full reasoning chain), rejected.jsonl entry for INVALID findings"
+            data_classification: internal
+            protocol: "file system write"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF9
+            source: P1
+            destination: P3
+            data_description: "finding dict with triage.confidence_score and graph_context.entrypoint_path"
+            data_classification: internal
+            protocol: "skill invocation"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF10
+            source: P3
+            destination: DS3
+            data_description: "attack-chains/VULN-NNN_<slug>.md"
+            data_classification: internal
+            protocol: "file system write"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF11
+            source: P1
+            destination: DS2
+            data_description: "vuln-research-report.yaml filled progressively across all stages"
+            data_classification: internal
+            protocol: "file system write"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF12
+            source: DS2
+            destination: P5
+            data_description: "Filled YAML report read for Markdown rendering"
+            data_classification: internal
+            protocol: "file system read"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF13
+            source: P5
+            destination: A1
+            data_description: "vuln-research-report.md rendered from YAML via Jinja2 template"
+            data_classification: internal
+            protocol: "file system write"
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+        trust_boundaries:
+          - id: TB1
+            name: "Skill Execution Environment"
+            type: process
+            contains: [P1, P2, P3, P4, P5, DS1, DS2, DS3]
+
+          - id: TB2
+            name: "Target Repository Boundary"
+            type: third_party
+            contains: [A3]
+
+        mermaid: |
+          graph LR
+            A1([Researcher]) --> A2[Claude Code Harness]
+            A2 --> P1[sec-vuln-research\norchestrator]
+
+            subgraph TB1[Skill Execution Environment]
+              P1 --> P4[analyze.py\ntrailmark ingest]
+              P1 --> P2[sec-vuln-triage\nverifier]
+              P1 --> P3[sec-attack-chain\ngenerator]
+              P1 --> P5[render_report.py\nMarkdown renderer]
+              P4 --> DS1[(ingest_graph.json)]
+              DS1 --> P1
+              P1 --> DS2[(vuln-research-report.yaml)]
+              DS2 --> P5
+              P2 --> DS3[(triage/ attack-chains/\nrejected.jsonl)]
+              P3 --> DS3
+              P5 --> A1
+            end
+
+            P4 -.->|read-only| A3([Target Repository\nuuntrusted])
+
+    attack_surface:
+      total_external_entry_points: 2      # two CLI scripts with file system + stdout I/O
+      total_internal_entry_points: 3      # three skill plugin hooks invokable by Claude Code harness
+      unauthenticated_entry_points:
+        - component: sec-vuln-research-skill
+          entry_point_id: EP-001
+          path_or_name: "analyze.py <target_path> --output <path> [--sarif <path>]"
+        - component: sec-vuln-research-skill
+          entry_point_id: EP-002
+          path_or_name: "render_report.py <yaml_file> [--output <path>]"
+        - component: sec-vuln-research-skill
+          entry_point_id: EP-003
+          path_or_name: "sec-vuln-research (SKILL.md)"
+        - component: sec-vuln-triage-skill
+          entry_point_id: EP-004
+          path_or_name: "sec-vuln-triage (SKILL.md)"
+        - component: sec-attack-chain-skill
+          entry_point_id: EP-005
+          path_or_name: "sec-attack-chain (SKILL.md)"
+      file_upload_endpoints:
+        - component: sec-vuln-research-skill
+          entry_point_id: EP-002
+          path_or_name: "render_report.py <yaml_file> [--output <path>]"
+      admin_interfaces: []
+      debug_endpoints: []
+
+  delta_report: null

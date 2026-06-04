@@ -1,0 +1,167 @@
+component:
+  analysis_provenance:
+    carried_forward_reason: null
+    from_commit_sha: cfe609975c7a806b7cc2b9ec3f616ed460e9878c
+    from_snapshot_id: null
+    modules_rerun:
+    - classify
+    - stack-analyze
+    source: fresh_analysis
+  authentication:
+    credential_storage: null
+    mechanisms: []
+    service_to_service_auth:
+      detected: false
+      evidence: []
+      mechanism: none
+    session_management:
+      mechanism: none
+      session_store: none
+  authorization:
+    api_key_management:
+      revocation_supported: false
+      rotation_supported: false
+      scoping: null
+    enforcement_points: []
+    framework: null
+    model: none
+    policy_location: null
+    resource_types: []
+  classification:
+    ai_agent:
+      detected: false
+      evidence: []
+      framework: null
+      guardrails_present: false
+      memory_mechanism: none
+      models_referenced: []
+      rag_detected: false
+      tools_defined: []
+    api_service:
+      detected: false
+      evidence: []
+      framework: null
+      spec_file:
+        format: null
+        path: null
+        present: false
+      style: null
+    browser_extension:
+      detected: false
+      evidence: []
+      manifest_version: null
+      permissions_requested: []
+      target_browsers: []
+    cli_tool:
+      commands: []
+      detected: false
+      entry_point: null
+      evidence: []
+      framework: null
+    data_pipeline:
+      detected: false
+      evidence: []
+      framework: null
+    database_migration:
+      database_type: null
+      detected: false
+      evidence: []
+      migration_framework: null
+      pii_columns_detected: []
+    event_consumer_or_worker:
+      detected: false
+      event_sources: []
+      evidence: []
+      processing_model: null
+      queue_technology: null
+    fork_or_vendor_copy:
+      detected: false
+      evidence: []
+      local_modifications: false
+      upstream_commit: null
+      upstream_url: null
+    infrastructure_as_code:
+      detected: false
+      evidence: []
+      frameworks: []
+    library_or_sdk:
+      detected: true
+      evidence:
+      - '.claude-plugin/plugin.json: plugin registration manifest declares name, version,
+        author'
+      package_registry: null
+    machine_learning_model:
+      detected: false
+      evidence: []
+      inference_server: false
+      ml_framework: null
+      training_pipeline: false
+    mcp_server:
+      authentication: null
+      detected: false
+      evidence: []
+      framework: null
+      prompts: []
+      resources: []
+      tools: []
+      transport: null
+    mobile_application:
+      detected: false
+      evidence: []
+      framework: null
+      platform: null
+    proxy_or_gateway:
+      detected: false
+      evidence: []
+      routes_to: []
+      technology: null
+      type: null
+    scheduled_job:
+      detected: false
+      evidence: []
+      jobs: []
+      scheduler: null
+    smart_contract:
+      blockchain: null
+      detected: false
+      evidence: []
+      language: null
+    web_application:
+      backend_framework: null
+      detected: false
+      evidence: []
+      frontend_framework: null
+      sub_type: null
+  confidence:
+    limitations:
+    - Component is declarative metadata only (plugin.json). No code to analyze.
+    manual_review_recommended: false
+    overall: 0.95
+  cryptography:
+    operations_detected: []
+  data_stores: []
+  description: 'The plugin root holds the Claude agent plugin manifest and declares
+    the plugin identity (name, version, author). It has no executable code of its
+    own — it serves as the registration point for the three coordinated skills bundled
+    inside.
+
+    '
+  entry_points: []
+  id: plugin-root
+  name: sec-vuln-research Plugin Root
+  observability:
+    audit_trail_present: false
+    logging_framework: null
+  owner: null
+  path: .
+  tech_stack:
+    frameworks: []
+    languages:
+    - name: JSON
+      role: infrastructure
+      version_constraint: null
+    package_managers: []
+    runtime:
+      container_base_image: null
+      name: null
+      version: null

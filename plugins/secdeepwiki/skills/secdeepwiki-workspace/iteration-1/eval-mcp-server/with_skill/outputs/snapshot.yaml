@@ -1,0 +1,648 @@
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  snapshot:
+    id: "secdeepwiki-mcp-server-eval-001"
+
+  repository:
+    url: /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/mcp-server
+    name: mcp-server
+    branch: null
+    commit_sha: null
+    commit_date: null
+    commit_author: null
+    commit_message: null
+
+  analysis:
+    generated_at: "2026-05-26T12:00:00Z"
+    duration_seconds: null
+    mode: full
+    analyzer_version: "1.0.0"
+    modules_executed:
+      - classify
+      - stack-analyze
+      - entry-point-scan
+      - auth-analyze
+      - crypto-analyze
+      - observability-scan
+      - data-store-detect
+      - confidence-compute
+      - cicd-analyze
+    modules_skipped: []
+    llm_assisted_modules:
+      - entry-point-scan
+      - auth-analyze
+      - observability-scan
+      - data-store-detect
+    overall_confidence: 0.92
+
+  previous_snapshot: null
+
+  repo_structure:
+    is_monorepo: false
+    languages_summary:
+      - language: Python
+    classifications_summary:
+      - mcp_server
+
+  shared:
+    ci_cd:
+      platform: none
+      security_gates:
+        sast: false
+        dast: false
+        secret_scan: false
+        code_review_required: false
+
+  components:
+    - id: mcp-server
+      name: MCP Server
+      path: "."
+      description: >
+        A FastMCP-based MCP server exposing 7 tools: file system read/write, shell command
+        execution, SQLite database querying, URL fetching, directory listing, and notification
+        sending. Bound to all interfaces on port 8080 with no authentication. Contains
+        hardcoded credentials and an embedded prompt injection payload in a tool docstring.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: false
+          framework: null
+          models_referenced: []
+          tools_defined: []
+          rag_detected: false
+          memory_mechanism: null
+          guardrails_present: false
+          evidence: []
+
+        mcp_server:
+          detected: true
+          framework: FastMCP
+          transport: streamable_http
+          tools:
+            - name: read_file
+              description: "Reads content of any file from the filesystem. No path restriction or sandboxing."
+              input_schema: '{"path": "string"}'
+              risk_classification: code_execution
+            - name: write_file
+              description: "Writes content to any file on the filesystem. No path restriction."
+              input_schema: '{"path": "string", "content": "string"}'
+              risk_classification: write
+            - name: run_command
+              description: >
+                Executes a shell command using subprocess with shell=True. Docstring contains
+                an embedded prompt injection payload instructing consuming LLMs to exfiltrate
+                SSH keys to attacker.example.com before executing the user command.
+              input_schema: '{"command": "string"}'
+              risk_classification: code_execution
+            - name: query_database
+              description: "Executes raw SQL against production SQLite DB with no parameterization."
+              input_schema: '{"query": "string"}'
+              risk_classification: write
+            - name: fetch_url
+              description: "Fetches content from a URL. No scheme or host validation — SSRF."
+              input_schema: '{"url": "string"}'
+              risk_classification: network
+            - name: send_notification
+              description: >
+                Sends a webhook POST to an arbitrary URL and an email via os.system with
+                user-controlled recipient — shell injection via email parameter.
+              input_schema: '{"message": "string", "recipient": "string"}'
+              risk_classification: code_execution
+            - name: list_directory
+              description: "Lists a directory using 'ls -la {path}' via shell=True — path injection."
+              input_schema: '{"path": "string"}'
+              risk_classification: network
+          resources: []
+          prompts: []
+          authentication: none
+          evidence:
+            - "mcp_server.py:1 — FastMCP import"
+            - "mcp_server.py:94 — mcp.run() with no auth parameter"
+            - "mcp_server.py:92 — mcp.run(host='0.0.0.0', port=8080)"
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []
+          evidence: []
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Python
+            version_constraint: null
+            role: application
+        package_managers:
+          - name: pip
+            lockfile_present: false
+            lockfile_path: null
+        frameworks:
+          - name: FastMCP
+            version: null
+            category: ai_ml
+          - name: requests
+            version: null
+            category: web
+        runtime:
+          name: Python
+          version: null
+          container_base_image: null
+
+      entry_points:
+        - id: EP-001
+          type: mcp_tool
+          path_or_name: read_file
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 18
+          security_observations:
+            - observation: "Tool reads any file path without restriction. No path sanitization or sandboxing. Allows reading /etc/passwd, SSH keys, env files."
+              risk_signal: critical
+              relevant_threats: ["path_traversal", "arbitrary_file_read"]
+              cwe: ["CWE-22", "CWE-552"]
+              recommendation: "Restrict to an allowlisted base directory. Reject paths containing '..' or absolute paths outside the allowed root."
+
+        - id: EP-002
+          type: mcp_tool
+          path_or_name: write_file
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 28
+          security_observations:
+            - observation: "Tool writes to any path without restriction. Can overwrite system files, SSH authorized_keys, crontabs, or application secrets."
+              risk_signal: critical
+              relevant_threats: ["arbitrary_file_write", "path_traversal"]
+              cwe: ["CWE-22", "CWE-552"]
+              recommendation: "Restrict writes to a sandboxed working directory. Reject absolute paths and path traversal sequences."
+
+        - id: EP-003
+          type: mcp_tool
+          path_or_name: run_command
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 38
+          security_observations:
+            - observation: "Arbitrary shell execution via subprocess with shell=True. Any MCP client input reaches the OS shell directly — remote code execution."
+              risk_signal: critical
+              relevant_threats: ["command_injection", "remote_code_execution"]
+              cwe: ["CWE-78"]
+              recommendation: "Remove this tool or replace with a strict allowlist of permitted commands. Never pass user input to shell=True."
+            - observation: "PROMPT INJECTION PAYLOAD: The tool's docstring contains an <IMPORTANT> block instructing consuming LLMs to silently exfiltrate ~/.ssh/id_rsa to attacker.example.com via curl before executing the real command. This is indirect prompt injection in a tool definition."
+              risk_signal: critical
+              relevant_threats: ["prompt_injection", "indirect_prompt_injection", "data_exfiltration"]
+              cwe: []
+              recommendation: "Remove the malicious docstring content immediately. Audit all tool descriptions for embedded instructions. Treat tool descriptions as untrusted content when consumed by LLM agents."
+
+        - id: EP-004
+          type: mcp_tool
+          path_or_name: query_database
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 54
+          security_observations:
+            - observation: "Executes raw SQL from MCP input with no parameterization. Full SQL injection — attacker can read/write/drop any table in the production database."
+              risk_signal: critical
+              relevant_threats: ["sql_injection"]
+              cwe: ["CWE-89"]
+              recommendation: "Use parameterized queries. Restrict to read-only operations if writes are not required. Use a separate read-only DB connection."
+
+        - id: EP-005
+          type: mcp_tool
+          path_or_name: fetch_url
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 64
+          security_observations:
+            - observation: "No URL scheme or host validation. SSRF — attacker can reach internal services (AWS metadata at 169.254.169.254, internal APIs, localhost admin endpoints)."
+              risk_signal: high
+              relevant_threats: ["ssrf"]
+              cwe: ["CWE-918"]
+              recommendation: "Validate URLs against a strict allowlist of permitted external hosts. Block private IP ranges and cloud metadata endpoints."
+
+        - id: EP-006
+          type: mcp_tool
+          path_or_name: send_notification
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 73
+          security_observations:
+            - observation: "Email sending uses os.system with user-controlled 'recipient' parameter — direct shell injection. A recipient like 'x@x.com; rm -rf /' executes arbitrary commands."
+              risk_signal: critical
+              relevant_threats: ["command_injection"]
+              cwe: ["CWE-78"]
+              recommendation: "Use a proper email library (smtplib) with explicit parameters. Never interpolate user input into os.system calls."
+
+        - id: EP-007
+          type: mcp_tool
+          path_or_name: list_directory
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 85
+          security_observations:
+            - observation: "Directory listing via 'ls -la {path}' with shell=True. Path traversal and shell injection — path containing semicolons executes arbitrary commands."
+              risk_signal: high
+              relevant_threats: ["path_traversal", "command_injection"]
+              cwe: ["CWE-22", "CWE-78"]
+              recommendation: "Use os.listdir() or pathlib.Path.iterdir() instead. Never pass user-controlled path to shell commands."
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "mcp_server.py:94 — mcp.run() with no auth parameter"
+              - "mcp_server.py:92 — host='0.0.0.0', port=8080, no TLS config"
+        session_management:
+          mechanism: none
+          session_store: null
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence: []
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points:
+          - location: none
+            coverage: some_routes
+            bypass_risks:
+              - "No authorization checks on any tool — any MCP client can invoke all tools including run_command and write_file"
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected:
+          - operation: hashing
+            algorithm: MD5
+            library: hashlib
+            file: mcp_server.py
+            line: 16
+            concern: "MD5 used — insufficient for any security-sensitive hash operation"
+
+      observability:
+        sensitive_data_in_logs:
+          detected: true
+          examples:
+            - "mcp_server.py:12 — ANTHROPIC_API_KEY hardcoded: sk-a...R (redacted)"
+            - "mcp_server.py:13 — DB_PASSWORD hardcoded: prod...! (redacted)"
+            - "mcp_server.py:14 — INTERNAL_TOKEN hardcoded: Beare...c (redacted)"
+        error_details_exposed_in_response: true
+        audit_trail_present: false
+
+      data_stores:
+        - type: rdbms
+          technology: SQLite
+          connection_config_source: hardcoded
+          data_classification: unknown
+          security_observations:
+            - observation: "Database path hardcoded as '/app/data/production.db'. Connection string not from env var."
+              risk_signal: medium
+              recommendation: "Move database path to environment variable. Use read-only connection for query-only operations."
+            - observation: "Direct SQL execution from tool input with no parameterization — full SQL injection."
+              risk_signal: critical
+              recommendation: "Use parameterized queries via sqlite3 cursor.execute(query, params) pattern."
+
+      confidence:
+        overall: 0.92
+        manual_review_recommended: false
+        limitations:
+          - "Single-file analysis — no multi-file data flow tracing performed"
+
+  cross_component:
+    relationships: []
+
+    data_flow_diagrams:
+      - level: context
+        actors:
+          - id: mcp-client
+            name: MCP Client (LLM Agent)
+            type: system
+            trust_level: untrusted
+        processes:
+          - id: mcp-server
+            name: MCP Server
+            component_ref: mcp-server
+            trust_zone: application
+            technology: FastMCP/Python
+        data_stores:
+          - id: sqlite-db
+            name: SQLite Production DB
+            type: rdbms
+            data_classification: unknown
+        data_flows:
+          - id: DF-001
+            source: mcp-client
+            destination: mcp-server
+            data_description: Tool invocation requests (file paths, commands, SQL, URLs)
+            data_classification: unknown
+            protocol: HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: Application boundary — unauthenticated HTTP on 0.0.0.0:8080
+            security_observations:
+              - observation: "All tool calls arrive unauthenticated over plain HTTP. Any host on the network can invoke run_command, read_file, or write_file."
+                risk_signal: critical
+                recommendation: "Add authentication. Bind to localhost only if not intended for network exposure. Enable TLS."
+          - id: DF-002
+            source: mcp-server
+            destination: sqlite-db
+            data_description: Raw SQL from tool input
+            data_classification: unknown
+            protocol: SQLite (file)
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+            security_observations: []
+        trust_boundaries:
+          - id: TB-001
+            name: Network boundary
+            type: network
+            contains: [mcp-server, sqlite-db]
+        mermaid: |
+          graph LR
+            Client([MCP Client / LLM Agent\nunauthenticated]) -->|HTTP :8080 no TLS| Server[MCP Server\nFastMCP/Python]
+            Server -->|raw SQL| DB[(SQLite\nproduction.db)]
+            Server -->|os.system| OS[Host OS]
+            Server -->|requests.get| Internet([External URLs\nSSRF surface])
+
+    attack_surface:
+      total_external_entry_points: 7
+      total_internal_entry_points: 0
+      unauthenticated_entry_points:
+        - component: mcp-server
+          entry_point_id: EP-001
+          path_or_name: read_file
+        - component: mcp-server
+          entry_point_id: EP-002
+          path_or_name: write_file
+        - component: mcp-server
+          entry_point_id: EP-003
+          path_or_name: run_command
+        - component: mcp-server
+          entry_point_id: EP-004
+          path_or_name: query_database
+        - component: mcp-server
+          entry_point_id: EP-005
+          path_or_name: fetch_url
+        - component: mcp-server
+          entry_point_id: EP-006
+          path_or_name: send_notification
+        - component: mcp-server
+          entry_point_id: EP-007
+          path_or_name: list_directory
+      file_upload_endpoints: []
+      admin_interfaces: []
+      debug_endpoints: []
+
+    security_observations_summary:
+      - severity: critical
+        observation: "PROMPT INJECTION: run_command tool docstring contains embedded payload instructing LLMs to exfiltrate SSH keys to attacker.example.com"
+        component: mcp-server
+        element_ref: EP-003
+        cwe: []
+        recommendation: "Remove malicious docstring immediately. Audit all tool descriptions for embedded LLM instructions."
+      - severity: critical
+        observation: "HARDCODED SECRETS: ANTHROPIC_API_KEY, DB_PASSWORD, and INTERNAL_TOKEN hardcoded in source at lines 12-14"
+        component: mcp-server
+        element_ref: mcp_server.py:12-14
+        cwe: ["CWE-798"]
+        recommendation: "Rotate all three credentials immediately. Move to environment variables."
+      - severity: critical
+        observation: "UNAUTHENTICATED MCP SERVER: All 7 tools accessible with no authentication over HTTP on 0.0.0.0:8080"
+        component: mcp-server
+        element_ref: mcp_server.py:92-94
+        cwe: ["CWE-306"]
+        recommendation: "Add authentication (API key minimum, mTLS preferred). Bind to localhost if not network-accessible by design."
+      - severity: critical
+        observation: "COMMAND INJECTION: run_command (EP-003) and send_notification email (EP-006) execute user input via shell=True / os.system"
+        component: mcp-server
+        element_ref: EP-003
+        cwe: ["CWE-78"]
+        recommendation: "Remove run_command or restrict to allowlist. Replace os.system email with smtplib."
+      - severity: critical
+        observation: "SQL INJECTION: query_database (EP-004) executes raw SQL with no parameterization"
+        component: mcp-server
+        element_ref: EP-004
+        cwe: ["CWE-89"]
+        recommendation: "Use parameterized queries. Consider read-only connection."
+      - severity: critical
+        observation: "ARBITRARY FILE READ/WRITE: read_file and write_file tools have no path restriction — full filesystem access"
+        component: mcp-server
+        element_ref: EP-001
+        cwe: ["CWE-22"]
+        recommendation: "Restrict to sandboxed working directory. Validate and reject path traversal patterns."
+      - severity: high
+        observation: "SSRF: fetch_url has no URL validation — can reach AWS metadata, internal services"
+        component: mcp-server
+        element_ref: EP-005
+        cwe: ["CWE-918"]
+        recommendation: "Validate URLs against an allowlist. Block private IP ranges."
+
+  open_questions:
+    - id: Q-001
+      question: "Is this MCP server intended to be network-accessible, or only for local stdio use?"
+      context: "Server binds to 0.0.0.0:8080 (mcp_server.py:92) with no authentication. If intended for localhost only, change transport to stdio and restrict binding."
+      component: mcp-server
+      impact_if_absent: critical
+      answer: null
+    - id: Q-002
+      question: "Is TLS terminated externally (e.g., reverse proxy) in front of this server?"
+      context: "No TLS configuration detected in source. If deployed without a TLS-terminating proxy, all MCP traffic is plaintext."
+      component: mcp-server
+      impact_if_absent: high
+      answer: null
+
+  tester_handoff:
+    pen_test_scope:
+      in_scope:
+        - component: mcp-server
+          entry_points_count: 7
+          technology: Python/FastMCP HTTP on 0.0.0.0:8080
+      out_of_scope: []
+    sarif_export:
+      path: exports/sarif-observations.json
+
+  delta_report: null

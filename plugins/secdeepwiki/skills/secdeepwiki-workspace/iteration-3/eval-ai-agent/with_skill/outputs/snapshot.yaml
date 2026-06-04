@@ -1,0 +1,670 @@
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  snapshot:
+    id: "secdeepwiki-ai-agent-iteration3-20260603"
+
+  repository:
+    url: /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/ai-agent
+    name: ai-agent
+    branch: null
+    commit_sha: null
+    commit_date: null
+    commit_author: null
+    commit_message: null
+
+  analysis:
+    generated_at: "2026-06-03T00:00:00Z"
+    duration_seconds: null
+    mode: full
+    analyzer_version: "3.0.0"
+    modules_executed:
+      - repo-scan
+      - component-detect
+      - classify
+      - stack-analyze
+      - entry-point-scan
+      - auth-analyze
+      - crypto-analyze
+      - observability-scan
+      - data-store-detect
+      - confidence-compute
+      - cicd-analyze
+      - relationship-map
+      - dfd-generate
+      - auth-flow-diagram
+      - attack-surface-aggregate
+    modules_skipped: []
+    llm_assisted_modules:
+      - classify
+      - auth-analyze
+      - data-store-detect
+    overall_confidence: 0.85
+
+  previous_snapshot: null
+
+  repo_structure:
+    is_monorepo: false
+    languages_summary:
+      - language: Python
+    classifications_summary:
+      - ai_agent
+      - cli_tool
+
+  shared:
+    ci_cd:
+      platform: none
+      security_gates:
+        sast: false
+        dast: false
+        secret_scan: false
+        code_review_required: false
+
+  components:
+    - id: code-assistant-agent
+      name: "Code Assistant Agent"
+      path: "."
+      description: >
+        A single-file Python CLI application that implements an interactive coding assistant.
+        The agent sends user messages to the OpenAI Chat Completions API (model: gpt-4o), then
+        autonomously executes any Python code blocks or shell commands that appear verbatim in
+        the LLM response. Source comment notes the agent is being extended to serve external
+        contractors in a future sprint.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: true
+          framework: custom
+          models_referenced:
+            - provider: openai
+              model_id: gpt-4o
+              api_key_source: hardcoded
+          tools_defined:
+            - name: python_code_exec
+              description: >
+                Executes Python code blocks extracted from the LLM response using exec().
+                Code is parsed from triple-backtick python fences in the assistant reply and
+                passed to exec() with the full process builtins in scope.
+              risk_surface: code_exec
+            - name: shell_command_exec
+              description: >
+                Executes shell commands extracted from the LLM response using
+                subprocess.run() with shell=True. Commands are identified by the literal
+                prefix "RUN: " in the assistant reply text.
+              risk_surface: code_exec
+          rag_detected: false
+          memory_mechanism: none
+          guardrails_present: false
+          evidence:
+            - "agent.py:5 — import openai"
+            - "agent.py:11 — client = openai.OpenAI(api_key=OPENAI_API_KEY)"
+            - "agent.py:29 — model='gpt-4o'"
+            - "agent.py:45 — exec(code, {'__builtins__': __builtins__})"
+            - "agent.py:53 — subprocess.run(cmd, shell=True, capture_output=True, text=True)"
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: true
+          framework: null
+          entry_point: "agent.py — if __name__ == '__main__': chat_loop()"
+          commands:
+            - name: chat_loop
+              description: >
+                Interactive REPL. Prompts once for a user_context string (role/context),
+                then enters a while-True loop accepting freeform user messages until the
+                user types "quit".
+              accepts_file_input: false
+              accepts_url_input: false
+          evidence:
+            - "agent.py:80 — if __name__ == '__main__': chat_loop()"
+            - "agent.py:59 — def chat_loop()"
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Python
+            version_constraint: null
+            role: application
+
+        package_managers: []
+
+        frameworks:
+          - name: openai
+            version: null
+            category: ai_ml
+
+        runtime:
+          name: Python
+          version: null
+          container_base_image: null
+
+      entry_points:
+        - id: EP-001
+          type: cli_command
+          path_or_name: chat_loop
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: agent.py
+          line_number: 59
+
+        - id: EP-002
+          type: user_interface_action
+          path_or_name: "run_agent_task — user_input parameter"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: agent.py
+          line_number: 22
+
+        - id: EP-003
+          type: user_interface_action
+          path_or_name: "run_agent_task — user_context parameter"
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: agent.py
+          line_number: 22
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "agent.py — no authentication mechanism present for the interactive user; no login, token verification, or identity check"
+
+        session_management:
+          mechanism: none
+          session_store: null
+
+        credential_storage:
+          password_hashing: null
+          salt_strategy: null
+          evidence: []
+
+        service_to_service_auth:
+          detected: true
+          mechanism: api_key
+          evidence:
+            - "agent.py:10 — OPENAI_API_KEY = 'sk-proj-4aB8...kL8' (hardcoded string literal)"
+            - "agent.py:11 — client = openai.OpenAI(api_key=OPENAI_API_KEY)"
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points:
+          - location: none
+            coverage: none
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []
+
+      observability:
+        logging_framework: null
+        audit_trail_present: false
+
+      data_stores: []
+
+      confidence:
+        overall: 0.85
+        manual_review_recommended: false
+        limitations:
+          - "No package manifest (pyproject.toml, requirements.txt, setup.py) present — Python version and exact dependency versions cannot be determined from source"
+          - "Single-file codebase with no lockfile — pinned versions of openai SDK and subprocess stdlib are unverifiable"
+
+  cross_component:
+    relationships: []
+
+    data_flow_diagrams:
+      - level: context
+        actors:
+          - id: A-USER
+            name: Interactive User
+            type: external_user
+            trust_level: untrusted
+
+          - id: A-OPENAI
+            name: OpenAI API
+            type: third_party_service
+            trust_level: partially_trusted
+
+          - id: A-HOST
+            name: Host OS
+            type: system
+            trust_level: highly_trusted
+
+        processes:
+          - id: P-AGENT
+            name: Code Assistant Agent
+            component_ref: code-assistant-agent
+            trust_zone: local_process
+            technology: Python / openai SDK
+
+        data_stores: []
+
+        data_flows:
+          - id: DF-001
+            source: A-USER
+            destination: P-AGENT
+            data_description: >
+              user_context string (role/context entered once per session) and user_input
+              (freeform task message entered each turn), both read from stdin.
+            data_classification: internal
+            protocol: stdin
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF-002
+            source: P-AGENT
+            destination: A-OPENAI
+            data_description: >
+              Chat Completions API request containing the rendered system prompt
+              (SYSTEM_TEMPLATE with user_context injected) and the user_input as the
+              user message. Transmitted over HTTPS using the openai SDK.
+            data_classification: internal
+            protocol: HTTPS
+            encryption_in_transit: tls
+            authentication: api_key
+            crosses_trust_boundary: true
+            boundary_crossed: "local_process → third_party_service (OpenAI)"
+
+          - id: DF-003
+            source: A-OPENAI
+            destination: P-AGENT
+            data_description: >
+              Chat Completions API response containing the assistant reply text. This
+              text is parsed by the agent for executable content: triple-backtick python
+              fences are passed to exec(); lines prefixed with "RUN: " are passed to
+              subprocess.run(shell=True).
+            data_classification: internal
+            protocol: HTTPS
+            encryption_in_transit: tls
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "third_party_service (OpenAI) → local_process"
+
+          - id: DF-004
+            source: P-AGENT
+            destination: A-HOST
+            data_description: >
+              Python code strings passed to exec() run inside the current process with
+              full builtins. Shell command strings passed to subprocess.run(shell=True)
+              invoke /bin/sh on the host.
+            data_classification: internal
+            protocol: OS syscall
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "agent process → host OS"
+
+          - id: DF-005
+            source: P-AGENT
+            destination: A-USER
+            data_description: >
+              Assistant reply and any appended subprocess stdout printed to terminal.
+              On unhandled exception, Python exception text (which may include API key
+              context) is printed via print(f"Error: {e}").
+            data_classification: internal
+            protocol: stdout
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+        trust_boundaries:
+          - id: TB-001
+            name: Agent Process Boundary
+            type: process
+            contains:
+              - P-AGENT
+
+          - id: TB-002
+            name: OpenAI Third-Party Boundary
+            type: third_party
+            contains:
+              - A-OPENAI
+
+          - id: TB-003
+            name: Host OS Boundary
+            type: machine
+            contains:
+              - A-HOST
+
+        mermaid: |
+          graph LR
+            User([Interactive User\nunauthenticated]) -->|stdin: user_context + user_input| Agent[/Code Assistant Agent\nPython • local process/]
+            Agent -->|HTTPS + API key\nChat Completions request| OpenAI([OpenAI API\ngpt-4o])
+            OpenAI -->|HTTPS\nassistant reply may contain code + shell commands| Agent
+            Agent -->|exec Python / subprocess shell=True| Host([Host OS])
+            Agent -->|stdout: reply + command output| User
+
+      - level: component
+        actors:
+          - id: A-USER
+            name: Interactive User
+            type: external_user
+            trust_level: untrusted
+
+          - id: A-OPENAI
+            name: OpenAI API
+            type: third_party_service
+            trust_level: partially_trusted
+
+          - id: A-HOST
+            name: Host OS
+            type: system
+            trust_level: highly_trusted
+
+        processes:
+          - id: P-CHAT-LOOP
+            name: "chat_loop()"
+            component_ref: code-assistant-agent
+            trust_zone: local_process
+            technology: Python
+
+          - id: P-RUN-TASK
+            name: "run_agent_task()"
+            component_ref: code-assistant-agent
+            trust_zone: local_process
+            technology: Python / openai SDK
+
+          - id: P-EXEC
+            name: "exec() + subprocess.run()"
+            component_ref: code-assistant-agent
+            trust_zone: local_process
+            technology: Python builtins + OS shell
+
+        data_stores: []
+
+        data_flows:
+          - id: DF-C-001
+            source: A-USER
+            destination: P-CHAT-LOOP
+            data_description: "user_context (stdin, once per session) and user_input (stdin, each turn)"
+            data_classification: internal
+            protocol: stdin
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF-C-002
+            source: P-CHAT-LOOP
+            destination: P-RUN-TASK
+            data_description: "user_input and user_context passed as function arguments"
+            data_classification: internal
+            protocol: in-process
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF-C-003
+            source: P-RUN-TASK
+            destination: A-OPENAI
+            data_description: >
+              POST /v1/chat/completions — system prompt contains user_context injected via
+              str.format(); user message contains raw user_input. No max_tokens limit set.
+            data_classification: internal
+            protocol: HTTPS
+            encryption_in_transit: tls
+            authentication: api_key
+            crosses_trust_boundary: true
+            boundary_crossed: "local_process → OpenAI third-party"
+
+          - id: DF-C-004
+            source: A-OPENAI
+            destination: P-RUN-TASK
+            data_description: >
+              LLM reply text. Parsed for ```python code blocks (→ exec()) and
+              "RUN: " prefixed lines (→ subprocess.run(shell=True)).
+            data_classification: internal
+            protocol: HTTPS
+            encryption_in_transit: tls
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "OpenAI third-party → local_process"
+
+          - id: DF-C-005
+            source: P-RUN-TASK
+            destination: P-EXEC
+            data_description: >
+              Extracted code string (from LLM reply) passed to exec();
+              extracted shell command string (from LLM reply) passed to subprocess.run(shell=True).
+            data_classification: internal
+            protocol: in-process
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+
+          - id: DF-C-006
+            source: P-EXEC
+            destination: A-HOST
+            data_description: >
+              Python bytecode executed in the agent process with full builtins scope;
+              shell commands forwarded to /bin/sh via subprocess.run(shell=True).
+            data_classification: internal
+            protocol: OS syscall
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: "agent process → host OS"
+
+        trust_boundaries:
+          - id: TB-001
+            name: Agent Process Boundary
+            type: process
+            contains:
+              - P-CHAT-LOOP
+              - P-RUN-TASK
+              - P-EXEC
+
+          - id: TB-002
+            name: OpenAI Third-Party Boundary
+            type: third_party
+            contains:
+              - A-OPENAI
+
+          - id: TB-003
+            name: Host OS Boundary
+            type: machine
+            contains:
+              - A-HOST
+
+        mermaid: |
+          sequenceDiagram
+            participant User as Interactive User
+            participant ChatLoop as chat_loop()
+            participant RunTask as run_agent_task()
+            participant OpenAI as OpenAI API (gpt-4o)
+            participant Exec as exec() / subprocess.run()
+            participant Host as Host OS
+
+            User->>ChatLoop: user_context (stdin, once)
+            loop while input != quit
+              User->>ChatLoop: user_input (stdin)
+              ChatLoop->>RunTask: user_input, user_context
+              RunTask->>OpenAI: POST /v1/chat/completions\nsystem[user_context injected] + user[user_input]
+              OpenAI-->>RunTask: assistant reply text
+              alt reply contains ```python block
+                RunTask->>Exec: exec(code_block, builtins)
+                Exec->>Host: execute Python in-process
+                Host-->>Exec: (side effects)
+              end
+              alt reply contains RUN: line
+                RunTask->>Exec: subprocess.run(cmd, shell=True)
+                Exec->>Host: /bin/sh -c cmd
+                Host-->>Exec: stdout/stderr
+                Exec-->>RunTask: appended to reply
+              end
+              RunTask-->>ChatLoop: reply string
+              ChatLoop-->>User: print to stdout
+            end
+
+    attack_surface:
+      total_external_entry_points: 2
+      total_internal_entry_points: 1
+      unauthenticated_entry_points:
+        - component: code-assistant-agent
+          entry_point_id: EP-001
+          path_or_name: chat_loop
+        - component: code-assistant-agent
+          entry_point_id: EP-002
+          path_or_name: "run_agent_task — user_input parameter"
+        - component: code-assistant-agent
+          entry_point_id: EP-003
+          path_or_name: "run_agent_task — user_context parameter"
+      file_upload_endpoints: []
+      admin_interfaces: []
+      debug_endpoints: []
+
+  delta_report: null

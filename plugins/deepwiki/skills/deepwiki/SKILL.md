@@ -1,6 +1,6 @@
 ---
 name: deepwiki
-description: Analyzes a Git repository (local path or GitHub URL) and generates a structured, navigable wiki as markdown files with Mermaid diagrams. Use this skill whenever the user wants to document a codebase, create a knowledge base, generate a wiki, or understand a project's architecture. Triggers: "create a wiki", "document this repo", "generate docs for", "deepwiki", "make a wiki from", "turn this repo into docs", "explain this codebase as a wiki", "wiki for github.com/...", "document owner/repo".
+description: Analyzes a Git repository (local path or GitHub URL) and generates a structured, navigable wiki as markdown files with Mermaid diagrams. Use this skill whenever the user wants to document a codebase, create a knowledge base, generate a wiki, or understand a project's architecture. Triggers "create a wiki", "document this repo", "generate docs for", "deepwiki", "make a wiki from", "turn this repo into docs", "explain this codebase as a wiki", "wiki for github.com/...", "document owner/repo".
 ---
 
 ## What This Skill Does

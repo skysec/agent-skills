@@ -1,0 +1,484 @@
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  snapshot:
+    id: "secdeepwiki-ai-agent-eval-002"
+
+  repository:
+    url: /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/ai-agent
+    name: code-assistant-agent
+    branch: null
+    commit_sha: null
+    commit_date: null
+    commit_author: null
+    commit_message: null
+
+  analysis:
+    generated_at: "2026-05-26T12:10:00Z"
+    duration_seconds: null
+    mode: full
+    analyzer_version: "1.0.0"
+    modules_executed:
+      - classify
+      - stack-analyze
+      - entry-point-scan
+      - auth-analyze
+      - crypto-analyze
+      - observability-scan
+      - data-store-detect
+      - confidence-compute
+      - cicd-analyze
+    modules_skipped: []
+    llm_assisted_modules:
+      - classify
+      - entry-point-scan
+      - auth-analyze
+      - observability-scan
+    overall_confidence: 0.85
+
+  previous_snapshot: null
+
+  repo_structure:
+    is_monorepo: false
+    languages_summary:
+      - language: Python
+    classifications_summary:
+      - ai_agent
+      - cli_tool
+
+  shared:
+    ci_cd:
+      platform: none
+      security_gates:
+        sast: false
+        dast: false
+        secret_scan: false
+        code_review_required: false
+
+  components:
+    - id: code-assistant-agent
+      name: Code Assistant Agent
+      path: "."
+      description: >
+        Single-file Python AI agent (82 lines) wrapping the OpenAI GPT-4o API. Automatically
+        executes Python code blocks and shell commands extracted from raw LLM output with no
+        human confirmation. Contains a hardcoded API key and is described in comments as
+        being extended to external contractors in a forthcoming sprint.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: true
+          framework: custom
+          models_referenced:
+            - provider: openai
+              model_id: gpt-4o
+              api_key_source: hardcoded
+          tools_defined:
+            - name: python_exec
+              description: "Executes any Python code block from LLM response via exec() with full builtins. No sandbox, no allowlist, no confirmation."
+              risk_surface: code_exec
+            - name: shell_exec
+              description: "Executes any 'RUN: ' prefixed line from LLM response via subprocess.run(shell=True). Full shell access."
+              risk_surface: code_exec
+          rag_detected: false
+          memory_mechanism: none
+          guardrails_present: false
+          evidence:
+            - "agent.py:1 — openai import"
+            - "agent.py:10 — OPENAI_API_KEY hardcoded literal"
+            - "agent.py:29 — model='gpt-4o'"
+            - "agent.py:45 — exec(code, {\"__builtins__\": __builtins__})"
+            - "agent.py:53 — subprocess.run(cmd, shell=True)"
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null
+          tools: []
+          resources: []
+          prompts: []
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: true
+          framework: custom
+          entry_point: agent.py
+          commands:
+            - name: run
+              description: "Interactive REPL loop accepting user_context then iterative user_input. Each iteration sends to GPT-4o and auto-executes code/shell from the response."
+              accepts_file_input: false
+              accepts_url_input: false
+          evidence:
+            - "agent.py:60 — if __name__ == '__main__': main()"
+            - "agent.py:63 — user_context = input(...)"
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      tech_stack:
+        languages:
+          - name: Python
+            version_constraint: null
+            role: application
+        package_managers:
+          - name: pip
+            lockfile_present: false
+            lockfile_path: null
+        frameworks:
+          - name: openai
+            version: null
+            category: ai_ml
+        runtime:
+          name: Python
+          version: null
+          container_base_image: null
+
+      entry_points:
+        - id: EP-001
+          type: cli_command
+          path_or_name: main
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: none
+          source_file: agent.py
+          line_number: 60
+          security_observations:
+            - observation: "user_context collected via input() and interpolated unescaped into system prompt via str.format() at agent.py:26. Attacker-controlled string reaches the system prompt directly — prompt injection leading to code execution."
+              risk_signal: critical
+              relevant_threats: ["prompt_injection", "indirect_prompt_injection"]
+              cwe: []
+              recommendation: "Use a static system prompt. Place user context in the user role with explicit delimiters. Never use str.format() with user input on the system prompt."
+            - observation: "Every user_input turn passed to OpenAI as user message with no filtering. LLM response auto-executed via exec() (agent.py:45) and subprocess.run(shell=True) (agent.py:53). Indirect prompt injection from any content the agent is asked to review leads directly to code execution."
+              risk_signal: critical
+              relevant_threats: ["indirect_prompt_injection", "remote_code_execution"]
+              cwe: ["CWE-78"]
+              recommendation: "Remove exec() and subprocess.run() on LLM output. Use a sandboxed code-execution API if execution capability is required. Add human confirmation before any execution."
+            - observation: "No authentication before contractor rollout (noted in comment). Any operator of the script will have full code/shell execution as the OS user running the process."
+              risk_signal: high
+              relevant_threats: ["missing_authentication"]
+              cwe: ["CWE-306"]
+              recommendation: "Add identity verification and per-user authorization before any multi-user rollout."
+
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "agent.py:60-80 — no authentication before agent loop"
+        session_management:
+          mechanism: none
+          session_store: null
+        credential_storage: null
+        service_to_service_auth:
+          detected: true
+          mechanism: api_key
+          evidence:
+            - "agent.py:10 — OPENAI_API_KEY hardcoded literal (CWE-798)"
+            - "agent.py:13 — client = openai.OpenAI(api_key=OPENAI_API_KEY)"
+
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points:
+          - location: none
+            coverage: some_routes
+            bypass_risks:
+              - "No authorization at any layer — all operators get full code/shell execution"
+        api_key_management:
+          scoping: null
+          rotation_supported: false
+          revocation_supported: false
+
+      cryptography:
+        operations_detected: []
+
+      observability:
+        sensitive_data_in_logs:
+          detected: true
+          examples:
+            - "agent.py:76 — print(f'Error: {e}') — raw OpenAI SDK exceptions may include API key fragments or request headers"
+            - "agent.py:10 — OPENAI_API_KEY = 'sk-proj-4aB8...kL8' (redacted) — key present in source at module level"
+        error_details_exposed_in_response: true
+        audit_trail_present: false
+
+      data_stores: []
+
+      confidence:
+        overall: 0.85
+        manual_review_recommended: false
+        limitations:
+          - "Single-file, no package manifest — framework versions unknown"
+          - "Dynamic LLM-driven execution paths not statically traceable beyond entry points"
+
+  cross_component:
+    relationships: []
+
+    data_flow_diagrams:
+      - level: context
+        actors:
+          - id: operator
+            name: "CLI Operator (future: contractor)"
+            type: external_user
+            trust_level: untrusted
+          - id: openai-api
+            name: OpenAI API
+            type: third_party_service
+            trust_level: partially_trusted
+        processes:
+          - id: agent
+            name: Code Assistant Agent
+            component_ref: code-assistant-agent
+            trust_zone: application
+            technology: Python/openai-sdk
+        data_stores: []
+        data_flows:
+          - id: DF-001
+            source: operator
+            destination: agent
+            data_description: user_context (→ system prompt) and iterative user_input (→ user message)
+            data_classification: internal
+            protocol: stdin
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: Process boundary — unauthenticated CLI
+            security_observations:
+              - observation: "user_context is formatted directly into the system prompt (str.format) — prompt injection surface leading to RCE"
+                risk_signal: critical
+                recommendation: "Static system prompt only. Context in user role with delimiters."
+          - id: DF-002
+            source: agent
+            destination: openai-api
+            data_description: System prompt + user messages → LLM response with embedded code/commands
+            data_classification: internal
+            protocol: HTTPS
+            encryption_in_transit: tls
+            authentication: api_key
+            crosses_trust_boundary: true
+            boundary_crossed: External API boundary
+            security_observations:
+              - observation: "LLM response returned over HTTPS but immediately parsed for exec() and subprocess — model output treated as trusted executable code"
+                risk_signal: critical
+                recommendation: "Never auto-execute LLM output. Treat model responses as untrusted user input."
+        trust_boundaries:
+          - id: TB-001
+            name: Process boundary
+            type: process
+            contains: [agent]
+        mermaid: |
+          graph LR
+            Operator([CLI Operator\nunauthenticated]) -->|stdin: user_context → system prompt\nuser_input → user message| Agent[Code Assistant Agent\nPython]
+            Agent -->|HTTPS + hardcoded API key| OpenAI([OpenAI API\ngpt-4o])
+            OpenAI -->|LLM response| Agent
+            Agent -->|exec() / subprocess shell=True| OS[Host OS]
+
+    attack_surface:
+      total_external_entry_points: 1
+      total_internal_entry_points: 0
+      unauthenticated_entry_points:
+        - component: code-assistant-agent
+          entry_point_id: EP-001
+          path_or_name: main (CLI)
+      file_upload_endpoints: []
+      admin_interfaces: []
+      debug_endpoints: []
+
+    security_observations_summary:
+      - severity: critical
+        observation: "HARDCODED API KEY: OpenAI API key hardcoded at agent.py:10 — CWE-798. Must be rotated immediately."
+        component: code-assistant-agent
+        element_ref: agent.py:10
+        cwe: ["CWE-798"]
+        recommendation: "Rotate key. Move to os.environ['OPENAI_API_KEY']. Scan git history."
+      - severity: critical
+        observation: "PROMPT INJECTION → RCE: user_context interpolated into system prompt via str.format() at agent.py:26. Attacker controls system prompt → model generates exec()/RUN: payload → code execution."
+        component: code-assistant-agent
+        element_ref: EP-001
+        cwe: []
+        recommendation: "Static system prompt only. Never use str.format() with user input on the system prompt."
+      - severity: critical
+        observation: "AUTO EXEC: LLM response auto-executed via exec() at agent.py:45 with full builtins — any prompt injection or model output manipulation leads to arbitrary code execution."
+        component: code-assistant-agent
+        element_ref: agent.py:45
+        cwe: ["CWE-78"]
+        recommendation: "Remove exec() on LLM output. Use a sandboxed execution environment with human confirmation."
+      - severity: critical
+        observation: "AUTO SHELL: LLM 'RUN: ' lines executed via subprocess.run(shell=True) at agent.py:53 — OS command injection from LLM output."
+        component: code-assistant-agent
+        element_ref: agent.py:53
+        cwe: ["CWE-78"]
+        recommendation: "Remove subprocess execution of LLM output. If needed, use an allowlist and require explicit confirmation."
+      - severity: high
+        observation: "NO AUTH BEFORE CONTRACTOR ROLLOUT: Agent has no authentication. All future contractors get full code/shell execution as the process OS user."
+        component: code-assistant-agent
+        element_ref: agent.py (comment)
+        cwe: ["CWE-306"]
+        recommendation: "Add authentication and per-identity authorization before any multi-user deployment."
+      - severity: high
+        observation: "API KEY LEAKAGE VIA EXCEPTIONS: agent.py:76 prints raw OpenAI exceptions which may contain API key fragments or request context."
+        component: code-assistant-agent
+        element_ref: agent.py:76
+        cwe: ["CWE-209"]
+        recommendation: "Catch specific exception types. Log stripped error codes only, never raw exception strings."
+
+  open_questions:
+    - id: Q-001
+      question: "What OS user runs this agent, and what filesystem/network privileges does it have?"
+      context: "exec() and subprocess.run(shell=True) at agent.py:45,53 execute with the full privileges of the running process. Impact scope depends on the OS user."
+      component: code-assistant-agent
+      impact_if_absent: critical
+      answer: null
+    - id: Q-002
+      question: "Has the hardcoded OpenAI API key (agent.py:10) been rotated? Is it present in git history?"
+      context: "OPENAI_API_KEY is a module-level literal. If this file was ever committed to version control, the key is in history permanently even after removal."
+      component: code-assistant-agent
+      impact_if_absent: critical
+      answer: null
+    - id: Q-003
+      question: "Is there rate limiting or quota enforcement on OpenAI API calls before the contractor rollout?"
+      context: "No max_tokens limit configured (agent.py:28-35 comment). Unbounded calls from multiple contractors could result in significant API cost abuse."
+      component: code-assistant-agent
+      impact_if_absent: high
+      answer: null
+    - id: Q-004
+      question: "Are there outbound network restrictions on the host that would limit data exfiltration via exec() or subprocess?"
+      context: "exec() with full builtins enables arbitrary network calls (urllib, requests, socket). Egress filtering is the only partial mitigating control."
+      component: code-assistant-agent
+      impact_if_absent: high
+      answer: null
+    - id: Q-005
+      question: "What security hardening is planned before the 'next sprint' contractor rollout described in the code comments?"
+      context: "Code comment explicitly mentions external contractor access. Current posture is unauthenticated full code/shell execution for any operator."
+      component: code-assistant-agent
+      impact_if_absent: critical
+      answer: null
+
+  tester_handoff:
+    pen_test_scope:
+      in_scope:
+        - component: code-assistant-agent
+          entry_points_count: 1
+          technology: Python CLI / OpenAI GPT-4o
+      out_of_scope: []
+    sarif_export:
+      path: exports/sarif-observations.json
+
+  delta_report: null

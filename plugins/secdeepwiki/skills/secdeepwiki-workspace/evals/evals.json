@@ -1,0 +1,23 @@
+{
+  "skill_name": "secdeepwiki",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm preparing for a security assessment and need a full security knowledge base for the MCP server at /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/mcp-server. Run secdeepwiki on it in full mode. I need to understand: what entry points it exposes, what tools are available (and their risk level), and its authentication status.",
+      "expected_output": "A snapshot.yaml and secdeepwiki.md containing: mcp_server classification with tools list and risk_classification per tool, entry_points catalog typed as mcp_tool, and authentication status.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Before I do a security review of the AI agent code at /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/ai-agent, run secdeepwiki to map its structure. I care especially about: what model providers it connects to, what tools it has, and how credentials are managed.",
+      "expected_output": "A snapshot.yaml and secdeepwiki.md containing: ai_agent classification with models_referenced (including api_key_source), tools_defined with risk_surface.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Run secdeepwiki on the security vulnerability research plugin at /Users/hecbercordova/Documents/Projects/ai_security/security_autoresearch/agent-skills/plugins/sec-vuln-research to generate a security inventory. I need to understand its components, what entry points or interfaces it exposes.",
+      "expected_output": "A snapshot.yaml and secdeepwiki.md with component inventory of the plugin (skills/scripts), classification of what each component is, and entry points or exposed interfaces.",
+      "files": []
+    }
+  ]
+}

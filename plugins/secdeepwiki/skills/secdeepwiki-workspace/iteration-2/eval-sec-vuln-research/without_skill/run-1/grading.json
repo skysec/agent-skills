@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": false,
+      "evidence": "No snapshot.yaml produced (no skill invoked)"
+    },
+    {
+      "text": "snapshot.yaml has at least one component defined",
+      "passed": false,
+      "evidence": "No snapshot.yaml produced (no skill invoked)"
+    },
+    {
+      "text": "At least 3 components detected (root + at least 2 skills)",
+      "passed": false,
+      "evidence": "No snapshot.yaml produced (no skill invoked)"
+    },
+    {
+      "text": "tester_handoff section is present and has pen_test_scope",
+      "passed": false,
+      "evidence": "No snapshot.yaml produced (no skill invoked)"
+    },
+    {
+      "text": "At least one open_question generated (Tier 2 unknowns)",
+      "passed": false,
+      "evidence": "No snapshot.yaml produced (no skill invoked)"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  }
+}

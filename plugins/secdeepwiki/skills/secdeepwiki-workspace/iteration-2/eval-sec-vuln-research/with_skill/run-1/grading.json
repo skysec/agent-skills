@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists and has key 'secdeepwiki'"
+    },
+    {
+      "text": "snapshot.yaml has at least one component defined",
+      "passed": true,
+      "evidence": "'secdeepwiki.components' has 4 items (min=1)"
+    },
+    {
+      "text": "At least 3 components detected (root + at least 2 skills)",
+      "passed": true,
+      "evidence": "'secdeepwiki.components' has 4 items (min=3)"
+    },
+    {
+      "text": "tester_handoff section is present and has pen_test_scope",
+      "passed": true,
+      "evidence": "'secdeepwiki.tester_handoff.pen_test_scope' is present"
+    },
+    {
+      "text": "At least one open_question generated (Tier 2 unknowns)",
+      "passed": true,
+      "evidence": "'secdeepwiki.open_questions' has 6 items (min=1)"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}
