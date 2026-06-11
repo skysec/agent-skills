@@ -77,7 +77,7 @@ secdeepwiki:
         document consumed by the Claude Code agent runtime, plus two Python CLI scripts
         (analyze.py for trailmark graph ingestion, render_report.py for Jinja2-based Markdown
         rendering) and YAML/Jinja2 templates.
-      owner: "Trail of Bits"
+      owner: "Hecber"
 
       analysis_provenance:
         source: fresh_analysis
@@ -366,7 +366,7 @@ secdeepwiki:
         dict and independently challenges it across four axes (Real/Triggerable/Impactful/Novel)
         using N rounds plus an arbiter LLM call. Produces a confidence-scored VALID/INVALID/UNCERTAIN
         verdict. Implemented entirely as SKILL.md with no Python scripts.
-      owner: "Trail of Bits"
+      owner: "Hecber"
 
       analysis_provenance:
         source: fresh_analysis
@@ -564,7 +564,7 @@ secdeepwiki:
         entry point via the trailmark call graph or grep-based caller tracing, documents the
         exploitation path step by step, and writes a PoC skeleton. Implemented as SKILL.md plus
         one Markdown reference template.
-      owner: "Trail of Bits"
+      owner: "Hecber"
 
       analysis_provenance:
         source: fresh_analysis

@@ -172,7 +172,7 @@ PreToolUse hooks run on every Bash command—performance is critical:
 
 ## Quality Standards
 
-These are Trail of Bits house standards on top of Anthropic's requirements.
+These are standards on top of Anthropic's requirements.
 
 ### Description Quality
 

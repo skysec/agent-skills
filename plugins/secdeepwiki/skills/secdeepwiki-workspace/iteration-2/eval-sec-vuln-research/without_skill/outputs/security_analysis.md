@@ -3,7 +3,7 @@
 **Target**: `/Users/hecbercordova/Documents/Projects/ai_security/security_autoresearch/agent-skills/plugins/sec-vuln-research`
 **Analysis date**: 2026-06-02
 **Plugin version**: 1.0.0
-**Author**: Trail of Bits
+**Author**: Hecber
 
 ---
 

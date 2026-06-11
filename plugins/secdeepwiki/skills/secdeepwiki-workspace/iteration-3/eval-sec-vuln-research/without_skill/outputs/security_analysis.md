@@ -8,7 +8,7 @@
 
 ## 1. Plugin Overview
 
-The `sec-vuln-research` plugin is a Trail of Bits–authored, multi-stage LLM-driven vulnerability research framework. It bundles three coordinated skills under a single plugin namespace:
+The `sec-vuln-research` plugin is an Hecber authored, multi-stage LLM-driven vulnerability research framework. It bundles three coordinated skills under a single plugin namespace:
 
 | Skill | Role |
 |-------|------|
@@ -16,7 +16,7 @@ The `sec-vuln-research` plugin is a Trail of Bits–authored, multi-stage LLM-dr
 | `sec-vuln-triage` | Adversarial verifier — multi-round, structurally independent confirmation of findings |
 | `sec-attack-chain` | Exploitation documenter — produces call-graph-grounded attack chains and PoC skeletons |
 
-The plugin version is `1.0.0`. Author is `Trail of Bits`.
+The plugin version is `1.0.0`. Author is `Hecber`.
 
 ---
 

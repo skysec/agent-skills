@@ -14,7 +14,7 @@
 |-------|-------|
 | Name | `sec-vuln-research` |
 | Version | `1.0.0` |
-| Author | Trail of Bits |
+| Author | Hecber |
 | Entry file | `.claude-plugin/plugin.json` |
 
 ### Skills (3)
