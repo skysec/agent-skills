@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.mcp_server.detected == true",
+      "passed": true,
+      "evidence": "'secdeepwiki.components[0].classification.mcp_server.detected' == True"
+    },
+    {
+      "text": "All mcp_server tools have a non-null risk_classification",
+      "passed": true,
+      "evidence": "All 7 items have 'risk_classification'"
+    },
+    {
+      "text": "At least one entry_point of type mcp_tool exists",
+      "passed": true,
+      "evidence": "'secdeepwiki.components[0].entry_points' has 7 items"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists with key 'secdeepwiki'"
+    },
+    {
+      "text": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "passed": true,
+      "evidence": "'secdeepwiki.cross_component.attack_surface.total_external_entry_points' present"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

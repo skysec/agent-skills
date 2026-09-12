@@ -1,0 +1,264 @@
+component:
+  analysis_provenance:
+    carried_forward_reason: null
+    from_commit_sha: null
+    from_snapshot_id: null
+    modules_rerun:
+    - classify
+    - stack-analyze
+    - entry-point-scan
+    - auth-analyze
+    - crypto-analyze
+    - observability-scan
+    - data-store-detect
+    - confidence-compute
+    source: fresh_analysis
+  authentication:
+    credential_storage: null
+    mechanisms:
+    - configuration_source: null
+      evidence:
+      - agent.py — no authentication check present before chat_loop() or run_agent_task()
+      mfa_enforced: false
+      provider: null
+      token_storage: none
+      type: none
+    service_to_service_auth:
+      detected: true
+      evidence:
+      - agent.py:10 — OPENAI_API_KEY = "sk-proj-4aB8...kL8" (hardcoded literal)
+      - agent.py:11 — client = openai.OpenAI(api_key=OPENAI_API_KEY)
+      mechanism: api_key
+    session_management:
+      mechanism: none
+      session_store: null
+  authorization:
+    api_key_management:
+      revocation_supported: false
+      rotation_supported: false
+      scoping: null
+    enforcement_points: []
+    framework: null
+    model: none
+    policy_location: null
+    resource_types: []
+  classification:
+    ai_agent:
+      detected: true
+      evidence:
+      - agent.py:5 — import openai
+      - agent.py:11 — client = openai.OpenAI(api_key=OPENAI_API_KEY)
+      - agent.py:29 — model="gpt-4o"
+      - 'agent.py:45 — exec(code, {"__builtins__": __builtins__})'
+      - agent.py:53 — subprocess.run(cmd, shell=True, ...)
+      framework: custom
+      guardrails_present: false
+      memory_mechanism: none
+      models_referenced:
+      - api_key_source: hardcoded
+        model_id: gpt-4o
+        provider: openai
+      rag_detected: false
+      tools_defined:
+      - description: 'Executes Python code blocks extracted from the LLM reply via
+          exec(). The LLM output is parsed for triple-backtick python blocks; each
+          block is passed verbatim to exec() with __builtins__ intact.
+
+          '
+        name: python_code_exec
+        risk_surface: code_exec
+      - description: 'Runs shell commands extracted from the LLM reply by detecting
+          lines prefixed with "RUN: ". Commands are passed to subprocess.run() with
+          shell=True and no restriction on what commands may be issued.
+
+          '
+        name: shell_command_exec
+        risk_surface: network
+    api_service:
+      detected: false
+      evidence: []
+      framework: null
+      spec_file:
+        format: null
+        path: null
+        present: false
+      style: null
+    browser_extension:
+      detected: false
+      evidence: []
+      manifest_version: null
+      permissions_requested: []
+      target_browsers: []
+    cli_tool:
+      commands:
+      - accepts_file_input: false
+        accepts_url_input: false
+        description: 'Interactive REPL started when the script is run directly. Reads
+          user context once at session start, then loops reading user input from stdin
+          until the user types ''quit''.
+
+          '
+        name: chat_loop
+      detected: true
+      entry_point: 'agent.py (if __name__ == "__main__": chat_loop())'
+      evidence:
+      - 'agent.py:80 — if __name__ == "__main__": chat_loop()'
+      - agent.py:59 — def chat_loop()
+      framework: null
+    data_pipeline:
+      detected: false
+      evidence: []
+      framework: null
+    database_migration:
+      database_type: null
+      detected: false
+      evidence: []
+      migration_framework: null
+      pii_columns_detected: []
+    event_consumer_or_worker:
+      detected: false
+      event_sources: []
+      evidence: []
+      processing_model: null
+      queue_technology: null
+    fork_or_vendor_copy:
+      detected: false
+      evidence: []
+      local_modifications: false
+      upstream_commit: null
+      upstream_url: null
+    infrastructure_as_code:
+      detected: false
+      evidence: []
+      frameworks: []
+    library_or_sdk:
+      detected: false
+      evidence: []
+      package_registry: null
+    machine_learning_model:
+      detected: false
+      evidence: []
+      inference_server: false
+      ml_framework: null
+      training_pipeline: false
+    mcp_server:
+      authentication: null
+      detected: false
+      evidence: []
+      framework: null
+      prompts: []
+      resources: []
+      tools: []
+      transport: null
+    mobile_application:
+      detected: false
+      evidence: []
+      framework: null
+      platform: null
+    proxy_or_gateway:
+      detected: false
+      evidence: []
+      routes_to: []
+      technology: null
+      type: null
+    scheduled_job:
+      detected: false
+      evidence: []
+      jobs: []
+      scheduler: null
+    smart_contract:
+      blockchain: null
+      detected: false
+      evidence: []
+      language: null
+    web_application:
+      backend_framework: null
+      detected: false
+      evidence: []
+      frontend_framework: null
+      sub_type: null
+  confidence:
+    limitations:
+    - Single file with no manifest; dependency versions cannot be confirmed.
+    - No Dockerfile or runtime spec; container or deployment context is unknown.
+    - Dynamic exec() and subprocess invocations mean the full tool surface is determined
+      at runtime by LLM output, not statically.
+    manual_review_recommended: false
+    overall: 0.9
+  cryptography:
+    operations_detected: []
+  data_stores: []
+  description: 'A single-file Python AI agent (agent.py) that acts as an interactive
+    coding assistant. It sends user queries to the OpenAI GPT-4o model via the openai
+    Python SDK and then locally executes any Python code blocks or shell commands
+    found in the model''s reply. The agent is described as being extended to serve
+    external contractors in the next sprint.
+
+    '
+  entry_points:
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-001
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 59
+    path_or_name: chat_loop
+    rate_limited: false
+    request_body_type: none
+    source_file: agent.py
+    type: cli_command
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-002
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 63
+    path_or_name: 'stdin: user_context collection'
+    rate_limited: false
+    request_body_type: none
+    source_file: agent.py
+    type: user_interface_action
+  - authentication_required: false
+    authorization_model: none
+    file_upload_accepted: false
+    http_method: null
+    id: EP-003
+    input_validation:
+      framework: null
+      present: false
+      schema_path: null
+    line_number: 66
+    path_or_name: 'stdin: user_input (main chat loop)'
+    rate_limited: false
+    request_body_type: none
+    source_file: agent.py
+    type: user_interface_action
+  id: code-assistant-agent
+  name: Code Assistant Agent
+  observability:
+    audit_trail_present: false
+    logging_framework: null
+  owner: null
+  path: .
+  tech_stack:
+    frameworks:
+    - category: ai_ml
+      name: openai
+      version: null
+    languages:
+    - name: Python
+      role: application
+      version_constraint: null
+    package_managers: []
+    runtime:
+      container_base_image: null
+      name: Python
+      version: null

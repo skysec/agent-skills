@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.ai_agent.detected == true",
+      "passed": true,
+      "evidence": "Field secdeepwiki.components[0].classification.ai_agent.detected = True"
+    },
+    {
+      "text": "ai_agent.models_referenced has at least one entry",
+      "passed": true,
+      "evidence": "List at secdeepwiki.components[0].classification.ai_agent.models_referenced has 1 items (min 1)"
+    },
+    {
+      "text": "Each model_referenced entry has api_key_source populated (not null)",
+      "passed": true,
+      "evidence": "All 1 items checked for field 'api_key_source'"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists; top-level keys: ['secdeepwiki']"
+    },
+    {
+      "text": "At least one entry in open_questions (Tier 2 unknowns)",
+      "passed": true,
+      "evidence": "List at secdeepwiki.open_questions has 5 items (min 1)"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

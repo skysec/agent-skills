@@ -1,6 +1,6 @@
 {
   "name": "sec-vuln-research",
-  "version": "1.0.0",
-  "description": "Multi-stage LLM-driven pipeline for finding, validating, and operationalizing security vulnerabilities in source code. Includes three coordinated skills: sec-vuln-research (full pipeline orchestrator), sec-vuln-triage (adversarial multi-round verifier), and sec-attack-chain (attack chain + PoC generator).",
-  "author": "Trail of Bits"
+  "version": "1.2.0",
+  "description": "Multi-stage LLM-driven pipeline for finding, validating, and operationalizing security vulnerabilities in source code. Includes three coordinated skills: sec-vuln-research (full pipeline orchestrator), sec-vuln-triage (three-lens adversarial verifier with code-computed tallies), and sec-attack-chain (attack chain + PoC + machine-readable validation plan). Verification claims, budget limits, dedup, and report integrity are enforced by bundled scripts (triage_tally.py, session_state.py, render_report.py, finding_id.py, ci_gate.py), not by the model. Outputs a validated report (YAML + Markdown), SARIF v2.1.0 with taint codeFlows, and validation-plan.json for downstream DAST/fuzz validation that closes the evidence ladder to exploit_demonstrated.",
+  "author": "Hecber Cordova"
 }

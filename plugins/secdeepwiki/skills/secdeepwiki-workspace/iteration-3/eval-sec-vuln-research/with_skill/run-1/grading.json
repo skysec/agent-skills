@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists with key 'secdeepwiki'"
+    },
+    {
+      "text": "snapshot.yaml has at least one component defined",
+      "passed": true,
+      "evidence": "'secdeepwiki.components' has 4 items"
+    },
+    {
+      "text": "At least 3 components detected (root + at least 2 skills)",
+      "passed": true,
+      "evidence": "'secdeepwiki.components' has 4 items"
+    },
+    {
+      "text": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "passed": true,
+      "evidence": "'secdeepwiki.cross_component.attack_surface.total_external_entry_points' present"
+    },
+    {
+      "text": "analysis.overall_confidence is set (not null)",
+      "passed": true,
+      "evidence": "'secdeepwiki.analysis.overall_confidence' present"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

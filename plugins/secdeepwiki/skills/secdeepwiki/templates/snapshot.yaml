@@ -1,0 +1,323 @@
+# ==============================================================================
+# SecDeepWiki Snapshot
+# Schema version: 3.0.0
+#
+# Usage: fill every `null` field during the corresponding phase.
+# Allowed enum values are noted inline as comments where the set is constrained.
+# YAML is the single source of truth — never edit the rendered .md directly.
+# Render to Markdown:
+#   uv run {baseDir}/scripts/render_report.py <path-to-this-file>
+# ==============================================================================
+
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  # ─── Snapshot Identity ─────────────────────────────────────────────────────
+  snapshot:
+    id: null                         # sha256(repo_url + commit_sha + schema_version + analyzer_version)
+
+  # ─── What Was Analyzed ─────────────────────────────────────────────────────
+  repository:
+    url: null                        # URI or local path
+    name: null
+    branch: null
+    commit_sha: null
+    commit_date: null                # ISO 8601
+    commit_author: null
+    commit_message: null
+
+  # ─── Analysis Metadata ─────────────────────────────────────────────────────
+  analysis:
+    generated_at: null
+    duration_seconds: null
+    mode: null                       # full | incremental
+    analyzer_version: "1.0.0"
+    modules_executed: []
+    modules_skipped: []              # incremental: unchanged components
+    llm_assisted_modules: []
+    overall_confidence: null         # float 0.0–1.0
+
+  # ─── Previous Snapshot (null on first run) ─────────────────────────────────
+  previous_snapshot: null
+
+  # ─── Repository-Level Structure ────────────────────────────────────────────
+  repo_structure:
+    is_monorepo: null
+    languages_summary: []            # [{language: string}]
+    classifications_summary: []      # union of all component classification types
+
+  # ─── Shared (repo-wide) Analysis ───────────────────────────────────────────
+  shared:
+    ci_cd:
+      platform: null                 # github_actions | gitlab_ci | jenkins | circleci |
+                                     # azure_devops | bitbucket_pipelines | aws_codepipeline |
+                                     # google_cloud_build | travisci | argo_workflows |
+                                     # tekton | buildkite | other | none
+      security_gates:
+        sast: null
+        dast: null
+        secret_scan: null
+        code_review_required: null
+
+  # ─── Component Analysis ────────────────────────────────────────────────────
+  components:
+    - id: null                       # kebab-case unique id
+      name: null
+      path: null                     # relative to repo root; "." for single-component repos
+      description: null              # 2-3 sentence LLM summary
+      owner: null                    # from CODEOWNERS, or null
+
+      analysis_provenance:
+        source: null                 # fresh_analysis | carried_forward
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun: []
+        carried_forward_reason: null
+
+      # ─── Classification ────────────────────────────────────────────────────
+      classification:
+        web_application:
+          detected: false
+          sub_type: null             # spa | ssr | mpa | static_site | pwa | hybrid
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null                # rest | graphql | grpc | soap | websocket | event_driven | json_rpc | odata | other
+          framework: null
+          spec_file:
+            present: false
+            format: null             # openapi_3 | openapi_2_swagger | asyncapi | protobuf | wsdl | raml | graphql_schema
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: false
+          framework: null
+          models_referenced: []      # [{provider, model_id, api_key_source}]
+          tools_defined: []          # [{name, description, risk_surface}]
+          rag_detected: false
+          memory_mechanism: null     # in-process | vector_db | file_system | none
+          guardrails_present: false
+          evidence: []
+
+        mcp_server:
+          detected: false
+          framework: null
+          transport: null            # stdio | sse | streamable_http | custom
+          tools: []                  # [{name, description, input_schema, risk_classification}]
+          resources: []              # [{uri_template, description}]
+          prompts: []                # [{name, description}]
+          authentication: null
+          evidence: []
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []               # [{name, description, accepts_file_input, accepts_url_input}]
+          evidence: []
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []             # [{name, paths[], providers_or_targets[], state_backend}]
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null     # batch | stream | scheduled | on_demand
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []                   # [{name, description}]
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null                 # api_gateway | reverse_proxy | bff | load_balancer | service_mesh_gateway
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null             # ios | android | cross_platform
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      # ─── Tech Stack ────────────────────────────────────────────────────────
+      tech_stack:
+        languages: []                # [{name, version_constraint, role}]
+        package_managers: []         # [{name, lockfile_present, lockfile_path}]
+        frameworks: []               # [{name, version, category}]
+        runtime:
+          name: null
+          version: null
+          container_base_image: null
+
+      # ─── Entry Points ──────────────────────────────────────────────────────
+      entry_points: []
+      # Each entry point:
+      # - id: EP-001
+      #   type: http_route           # http_route | grpc_method | graphql_query | graphql_mutation |
+      #                              # cli_command | event_handler | scheduled_job | websocket_handler |
+      #                              # file_watcher | queue_consumer | webhook_receiver | plugin_hook |
+      #                              # mcp_tool | mcp_resource | user_interface_action
+      #   path_or_name: /api/users
+      #   http_method: GET
+      #   authentication_required: yes  # yes | no | conditional | unknown
+      #   authorization_model: null
+      #   input_validation:
+      #     present: false
+      #     framework: null
+      #     schema_path: null
+      #   rate_limited: false
+      #   file_upload_accepted: false
+      #   request_body_type: json    # json | form | multipart | xml | protobuf | graphql | none
+      #   source_file: null
+      #   line_number: null
+
+      # ─── Authentication ────────────────────────────────────────────────────
+      authentication:
+        mechanisms: []               # [{type, provider, configuration_source, token_storage, mfa_enforced, evidence[]}]
+        session_management:          # Tier 2 — session timeout may live in IdP
+          mechanism: null            # server_side | jwt_stateless | jwt_with_blacklist | signed_cookie | none
+          session_store: null
+        credential_storage: null     # only if component handles passwords
+        service_to_service_auth:     # Tier 2 — may be injected by service mesh
+          detected: false
+          mechanism: null
+          evidence: []
+
+      # ─── Authorization ─────────────────────────────────────────────────────
+      authorization:
+        model: null                  # rbac | abac | pbac | acl | ownership | capability_based | hybrid | none | unknown
+        framework: null
+        policy_location: null        # code | config_file | external_service | database
+        resource_types: []           # [{name, access_patterns[]}]
+        enforcement_points: []       # [{location, coverage}]
+        api_key_management:
+          scoping: null
+          rotation_supported: null
+          revocation_supported: null
+
+      # ─── Cryptography ──────────────────────────────────────────────────────
+      cryptography:
+        operations_detected: []      # [{operation, algorithm, library, file, line}]
+
+      # ─── Observability ─────────────────────────────────────────────────────
+      observability:
+        logging_framework: null      # python logging | winston | zap | slf4j | etc. — null if none
+        audit_trail_present: false
+
+      # ─── Data Stores ───────────────────────────────────────────────────────
+      data_stores: []
+      # Each store:
+      # - type: rdbms                # rdbms | nosql | cache | object_storage | file_system |
+      #                              # vector_db | message_queue | search_engine
+      #   technology: PostgreSQL
+      #   name: null
+      #   connection_config_source: env_var  # env_var | config_file | hardcoded
+      #   data_classification: pii   # public | internal | confidential | restricted | pii | phi | pci | unknown
+      #   evidence: []
+
+      # ─── Confidence ────────────────────────────────────────────────────────
+      confidence:
+        overall: null                # float 0.0–1.0
+        manual_review_recommended: false
+        limitations: []
+
+  # ─── Cross-Component Analysis ──────────────────────────────────────────────
+  cross_component:
+    relationships: []
+    # Each relationship:
+    # - source: component-id
+    #   target: component-id
+    #   type: calls_api              # calls_api | imports_library | publishes_events_to |
+    #                                # consumes_events_from | reads_from_store | writes_to_store |
+    #                                # proxies_to | shares_database_with
+    #   protocol: HTTPS
+    #   authentication: jwt
+    #   data_classification: pii
+    #   trust_boundary_crossing: true
+
+    data_flow_diagrams: []
+    # Each DFD:
+    # - level: context               # context | container | component
+    #   actors: []
+    #   processes: []
+    #   data_stores: []
+    #   data_flows:
+    #     - id: DF-001
+    #       source: actor-id
+    #       destination: process-id
+    #       data_description: string
+    #       data_classification: string
+    #       protocol: HTTPS
+    #       encryption_in_transit: tls  # tls | mtls | none | unknown
+    #       authentication: string
+    #       crosses_trust_boundary: false
+    #       boundary_crossed: null
+    #   trust_boundaries: []
+    #   mermaid: null
+
+    attack_surface:
+      total_external_entry_points: null
+      total_internal_entry_points: null
+      unauthenticated_entry_points: []
+      file_upload_endpoints: []
+      admin_interfaces: []
+      debug_endpoints: []
+
+  # ─── Delta Report (null on first run) ──────────────────────────────────────
+  delta_report: null

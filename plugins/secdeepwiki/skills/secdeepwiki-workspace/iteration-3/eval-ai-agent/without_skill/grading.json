@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.ai_agent.detected == true",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "ai_agent.models_referenced has at least one entry",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "Each model_referenced entry has api_key_source populated (not null)",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    },
+    {
+      "text": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "passed": false,
+      "evidence": "No snapshot.yaml (no skill)"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  }
+}

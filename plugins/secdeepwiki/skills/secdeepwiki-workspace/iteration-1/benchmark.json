@@ -1,0 +1,236 @@
+{
+  "metadata": {
+    "skill_name": "secdeepwiki",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-06-02T21:25:26Z",
+    "evals_run": [
+      0,
+      1
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 218.5,
+        "tokens": 41806,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "snapshot.yaml has classification.ai_agent.detected == true",
+          "passed": true,
+          "evidence": "Field secdeepwiki.components[0].classification.ai_agent.detected = True"
+        },
+        {
+          "text": "ai_agent.models_referenced has at least one entry",
+          "passed": true,
+          "evidence": "List at secdeepwiki.components[0].classification.ai_agent.models_referenced has 1 items (min 1)"
+        },
+        {
+          "text": "Each model_referenced entry has api_key_source populated (not null)",
+          "passed": true,
+          "evidence": "All 1 items checked for field 'api_key_source'"
+        },
+        {
+          "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+          "passed": true,
+          "evidence": "File exists; top-level keys: ['secdeepwiki']"
+        },
+        {
+          "text": "At least one entry in open_questions (Tier 2 unknowns)",
+          "passed": true,
+          "evidence": "List at secdeepwiki.open_questions has 5 items (min 1)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 43.7,
+        "tokens": 31471,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "snapshot.yaml has classification.mcp_server.detected == true",
+          "passed": true,
+          "evidence": "Field secdeepwiki.components[0].classification.mcp_server.detected = True"
+        },
+        {
+          "text": "All mcp_server tools have a non-null risk_classification",
+          "passed": true,
+          "evidence": "All 7 items checked for field 'risk_classification'"
+        },
+        {
+          "text": "At least one entry_point of type mcp_tool exists",
+          "passed": true,
+          "evidence": "List at secdeepwiki.components[0].entry_points has 7 items (min 1)"
+        },
+        {
+          "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+          "passed": true,
+          "evidence": "File exists; top-level keys: ['secdeepwiki']"
+        },
+        {
+          "text": "At least one security_observation with a non-empty observation string exists",
+          "passed": true,
+          "evidence": "Found 7 observations; non-empty: True"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5,
+        "time_seconds": 103.6,
+        "tokens": 17010,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "snapshot.yaml has classification.ai_agent.detected == true",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "ai_agent.models_referenced has at least one entry",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "Each model_referenced entry has api_key_source populated (not null)",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+          "passed": false,
+          "evidence": "snapshot.yaml does not exist"
+        },
+        {
+          "text": "At least one entry in open_questions (Tier 2 unknowns)",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5,
+        "time_seconds": 105.6,
+        "tokens": 17628,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "snapshot.yaml has classification.mcp_server.detected == true",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "All mcp_server tools have a non-null risk_classification",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "At least one entry_point of type mcp_tool exists",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        },
+        {
+          "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+          "passed": false,
+          "evidence": "snapshot.yaml does not exist"
+        },
+        {
+          "text": "At least one security_observation with a non-empty observation string exists",
+          "passed": false,
+          "evidence": "snapshot.yaml missing or unreadable"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 131.1,
+        "stddev": 123.6023,
+        "min": 43.7,
+        "max": 218.5
+      },
+      "tokens": {
+        "mean": 36638.5,
+        "stddev": 7307.9486,
+        "min": 31471,
+        "max": 41806
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "time_seconds": {
+        "mean": 104.6,
+        "stddev": 1.4142,
+        "min": 103.6,
+        "max": 105.6
+      },
+      "tokens": {
+        "mean": 17319.0,
+        "stddev": 436.992,
+        "min": 17010,
+        "max": 17628
+      }
+    },
+    "delta": {
+      "pass_rate": "+1.00",
+      "time_seconds": "+26.5",
+      "tokens": "+19320"
+    }
+  },
+  "notes": []
+}

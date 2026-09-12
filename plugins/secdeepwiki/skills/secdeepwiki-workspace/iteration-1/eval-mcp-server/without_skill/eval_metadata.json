@@ -1,0 +1,42 @@
+{
+  "eval_id": 1,
+  "eval_name": "mcp-server-security-inventory",
+  "prompt": "I'm preparing for a security assessment and need a full security knowledge base for the MCP server at /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/mcp-server. Run secdeepwiki on it in full mode. I need to understand: what entry points it exposes, what tools are available (and their risk level), and any security concerns I should know before testing.",
+  "assertions": [
+    {
+      "id": "mcp_server_classified",
+      "description": "snapshot.yaml has classification.mcp_server.detected == true",
+      "type": "yaml_field_equals",
+      "path": "secdeepwiki.components[0].classification.mcp_server.detected",
+      "expected": true
+    },
+    {
+      "id": "tools_have_risk_classification",
+      "description": "All mcp_server tools have a non-null risk_classification",
+      "type": "yaml_all_items_have_field",
+      "path": "secdeepwiki.components[0].classification.mcp_server.tools",
+      "field": "risk_classification"
+    },
+    {
+      "id": "entry_points_present",
+      "description": "At least one entry_point of type mcp_tool exists",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.components[0].entry_points",
+      "min_length": 1
+    },
+    {
+      "id": "snapshot_yaml_valid",
+      "description": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "type": "file_exists_with_key",
+      "file": "snapshot.yaml",
+      "key": "secdeepwiki"
+    },
+    {
+      "id": "open_questions_generated",
+      "description": "At least one open_question generated (Tier 2 unknowns)",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.open_questions",
+      "min_length": 1
+    }
+  ]
+}

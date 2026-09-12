@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.ai_agent.detected == true",
+      "passed": true,
+      "evidence": "'secdeepwiki.components[0].classification.ai_agent.detected' == True"
+    },
+    {
+      "text": "ai_agent.models_referenced has at least one entry",
+      "passed": true,
+      "evidence": "'secdeepwiki.components[0].classification.ai_agent.models_referenced' has 1 items"
+    },
+    {
+      "text": "Each model_referenced entry has api_key_source populated (not null)",
+      "passed": true,
+      "evidence": "All 1 items have 'api_key_source'"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": true,
+      "evidence": "File exists with key 'secdeepwiki'"
+    },
+    {
+      "text": "cross_component.attack_surface.total_external_entry_points is present (not null)",
+      "passed": true,
+      "evidence": "'secdeepwiki.cross_component.attack_surface.total_external_entry_points' present"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,795 @@
+# ==============================================================================
+# SecDeepWiki Snapshot
+# Schema version: 3.0.0
+#
+# Target: /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/mcp-server
+# Mode: full
+# ==============================================================================
+
+secdeepwiki:
+  schema_version: "3.0.0"
+
+  snapshot:
+    id: "secdeepwiki-mcp-server-full-20260603"
+
+  repository:
+    url: "file:///Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/mcp-server"
+    name: "mcp-server"
+    branch: null
+    commit_sha: null
+    commit_date: null
+    commit_author: null
+    commit_message: null
+
+  analysis:
+    generated_at: "2026-06-03T00:00:00Z"
+    duration_seconds: null
+    mode: "full"
+    analyzer_version: "1.0.0"
+    modules_executed:
+      - classify
+      - stack-analyze
+      - entry-point-scan
+      - auth-analyze
+      - crypto-analyze
+      - observability-scan
+      - data-store-detect
+      - confidence-compute
+      - cicd-analyze
+      - relationship-map
+      - dfd-generate
+      - auth-flow-diagram
+      - attack-surface-aggregate
+    modules_skipped: []
+    llm_assisted_modules:
+      - classify
+      - auth-analyze
+      - data-store-detect
+    overall_confidence: 0.95
+
+  previous_snapshot: null
+
+  repo_structure:
+    is_monorepo: false
+    languages_summary:
+      - language: "Python"
+    classifications_summary:
+      - mcp_server
+
+  shared:
+    ci_cd:
+      platform: none
+      security_gates:
+        sast: false
+        dast: false
+        secret_scan: false
+        code_review_required: false
+
+  components:
+    - id: "mcp-server"
+      name: "InternalTools MCP Server"
+      path: "."
+      description: >
+        A single-file Python MCP server built with FastMCP that exposes system utilities and
+        application data to an internal AI assistant fleet. It provides tools for filesystem
+        access, shell command execution, database queries, URL fetching, and notifications.
+        It runs as an HTTP server on all interfaces (0.0.0.0:8080) with no authentication.
+      owner: null
+
+      analysis_provenance:
+        source: fresh_analysis
+        from_snapshot_id: null
+        from_commit_sha: null
+        modules_rerun:
+          - classify
+          - stack-analyze
+          - entry-point-scan
+          - auth-analyze
+          - crypto-analyze
+          - observability-scan
+          - data-store-detect
+          - confidence-compute
+        carried_forward_reason: null
+
+      # ─── Classification ────────────────────────────────────────────────────
+      classification:
+        web_application:
+          detected: false
+          sub_type: null
+          frontend_framework: null
+          backend_framework: null
+          evidence: []
+
+        api_service:
+          detected: false
+          style: null
+          framework: null
+          spec_file:
+            present: false
+            format: null
+            path: null
+          evidence: []
+
+        ai_agent:
+          detected: false
+          framework: null
+          models_referenced: []
+          tools_defined: []
+          rag_detected: false
+          memory_mechanism: null
+          guardrails_present: false
+          evidence: []
+
+        mcp_server:
+          detected: true
+          framework: "fastmcp"
+          transport: streamable_http
+          tools:
+            - name: read_file
+              description: "Read any file from the server filesystem."
+              input_schema: '{"path": "str"}'
+              risk_classification: read_only
+            - name: write_file
+              description: "Write content to a file at the specified path."
+              input_schema: '{"path": "str", "content": "str"}'
+              risk_classification: write
+            - name: run_command
+              description: >
+                Execute a shell command on the server. The docstring contains embedded
+                instructions directing the tool to perform an additional curl command to an
+                external host before executing the user command; this text is present verbatim
+                in the source.
+              input_schema: '{"command": "str"}'
+              risk_classification: code_execution
+            - name: query_database
+              description: "Execute a SQL query against the application database and return results."
+              input_schema: '{"sql": "str"}'
+              risk_classification: read_only
+            - name: fetch_url
+              description: "Fetch content from a URL and return the response body. No URL validation is performed in source."
+              input_schema: '{"url": "str"}'
+              risk_classification: network
+            - name: send_notification
+              description: >
+                Send a notification to a user via Slack, email, or webhook. When channel is
+                'webhook', posts to the URL provided in the recipient field with no allowlist
+                check. When channel is 'email', invokes sendmail via os.system with the
+                recipient and message interpolated directly into the shell string.
+              input_schema: '{"recipient": "str", "message": "str", "channel": "str [default: slack]"}'
+              risk_classification: network
+            - name: list_directory
+              description: "List all files and directories at the given path."
+              input_schema: '{"path": "str"}'
+              risk_classification: read_only
+          resources: []
+          prompts: []
+          authentication: none
+          evidence:
+            - "mcp_server.py:5 — from fastmcp import FastMCP"
+            - "mcp_server.py:16 — mcp = FastMCP(\"InternalTools\")"
+            - "mcp_server.py:94 — mcp.run(transport=\"http\", host=\"0.0.0.0\", port=8080)"
+            - "mcp_server.py:93 — comment: '# Run with no authentication middleware'"
+
+        cli_tool:
+          detected: false
+          framework: null
+          entry_point: null
+          commands: []
+          evidence: []
+
+        library_or_sdk:
+          detected: false
+          package_registry: null
+          evidence: []
+
+        infrastructure_as_code:
+          detected: false
+          frameworks: []
+          evidence: []
+
+        event_consumer_or_worker:
+          detected: false
+          queue_technology: null
+          event_sources: []
+          processing_model: null
+          evidence: []
+
+        scheduled_job:
+          detected: false
+          scheduler: null
+          jobs: []
+          evidence: []
+
+        proxy_or_gateway:
+          detected: false
+          type: null
+          technology: null
+          routes_to: []
+          evidence: []
+
+        smart_contract:
+          detected: false
+          blockchain: null
+          language: null
+          evidence: []
+
+        mobile_application:
+          detected: false
+          platform: null
+          framework: null
+          evidence: []
+
+        browser_extension:
+          detected: false
+          target_browsers: []
+          manifest_version: null
+          permissions_requested: []
+          evidence: []
+
+        data_pipeline:
+          detected: false
+          framework: null
+          evidence: []
+
+        machine_learning_model:
+          detected: false
+          ml_framework: null
+          training_pipeline: false
+          inference_server: false
+          evidence: []
+
+        database_migration:
+          detected: false
+          migration_framework: null
+          database_type: null
+          pii_columns_detected: []
+          evidence: []
+
+        fork_or_vendor_copy:
+          detected: false
+          upstream_url: null
+          upstream_commit: null
+          local_modifications: false
+          evidence: []
+
+      # ─── Tech Stack ────────────────────────────────────────────────────────
+      tech_stack:
+        languages:
+          - name: Python
+            version_constraint: null    # No pyproject.toml or requirements.txt present
+            role: application
+        package_managers:
+          - name: null                  # No manifest file (package.json, pyproject.toml, etc.) detected
+            lockfile_present: false
+            lockfile_path: null
+        frameworks:
+          - name: fastmcp
+            version: null              # Version not pinned in any detected manifest
+            category: other
+          - name: sqlite3
+            version: null
+            category: other
+          - name: requests
+            version: null
+            category: other
+        runtime:
+          name: Python
+          version: null
+          container_base_image: null
+
+      # ─── Entry Points ──────────────────────────────────────────────────────
+      entry_points:
+        - id: EP-001
+          type: mcp_tool
+          path_or_name: read_file
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 20
+
+        - id: EP-002
+          type: mcp_tool
+          path_or_name: write_file
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 27
+
+        - id: EP-003
+          type: mcp_tool
+          path_or_name: run_command
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 35
+
+        - id: EP-004
+          type: mcp_tool
+          path_or_name: query_database
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 52
+
+        - id: EP-005
+          type: mcp_tool
+          path_or_name: fetch_url
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 63
+
+        - id: EP-006
+          type: mcp_tool
+          path_or_name: send_notification
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 72
+
+        - id: EP-007
+          type: mcp_tool
+          path_or_name: list_directory
+          http_method: null
+          authentication_required: no
+          authorization_model: none
+          input_validation:
+            present: false
+            framework: null
+            schema_path: null
+          rate_limited: false
+          file_upload_accepted: false
+          request_body_type: json
+          source_file: mcp_server.py
+          line_number: 85
+
+      # ─── Authentication ────────────────────────────────────────────────────
+      authentication:
+        mechanisms:
+          - type: none
+            provider: null
+            configuration_source: null
+            token_storage: none
+            mfa_enforced: false
+            evidence:
+              - "mcp_server.py:93 — comment: '# Run with no authentication middleware'"
+              - "mcp_server.py:94 — mcp.run(transport=\"http\", host=\"0.0.0.0\", port=8080) — no auth parameter passed"
+        session_management:
+          mechanism: none
+          session_store: null
+        credential_storage: null
+        service_to_service_auth:
+          detected: false
+          mechanism: none
+          evidence:
+            - "mcp_server.py:12-14 — Three credentials present as module-level hardcoded string literals (values redacted)"
+
+      # ─── Authorization ─────────────────────────────────────────────────────
+      authorization:
+        model: none
+        framework: null
+        policy_location: null
+        resource_types: []
+        enforcement_points:
+          - location: none
+            coverage: none
+        api_key_management:
+          scoping: null
+          rotation_supported: null
+          revocation_supported: null
+
+      # ─── Cryptography ──────────────────────────────────────────────────────
+      cryptography:
+        operations_detected: []       # No crypto library imports or operations detected in source
+
+      # ─── Observability ─────────────────────────────────────────────────────
+      observability:
+        logging_framework: null       # No logging imports or log statements detected
+        audit_trail_present: false
+
+      # ─── Data Stores ───────────────────────────────────────────────────────
+      data_stores:
+        - type: rdbms
+          technology: SQLite
+          name: production.db
+          connection_config_source: hardcoded
+          data_classification: unknown
+          evidence:
+            - "mcp_server.py:54 — sqlite3.connect(\"/app/data/production.db\")"
+            - "mcp_server.py:8 — import sqlite3"
+
+      # ─── Confidence ────────────────────────────────────────────────────────
+      confidence:
+        overall: 0.95
+        manual_review_recommended: false
+        limitations:
+          - "No manifest file present (pyproject.toml, requirements.txt, setup.py); fastmcp and requests versions cannot be determined from source."
+          - "No git history available for this path; commit SHA and date are unknown."
+          - "The tool 'run_command' uses subprocess with shell=True and an unresolved command string; full execution behavior depends on runtime inputs not visible in source."
+
+  # ─── Cross-Component Analysis ──────────────────────────────────────────────
+  cross_component:
+    relationships: []   # Single-component repository; no inter-component relationships
+
+    data_flow_diagrams:
+      - level: context
+        actors:
+          - id: A-001
+            name: AI Agent / MCP Client
+            type: system
+            trust_level: untrusted
+          - id: A-002
+            name: External HTTP Services
+            type: third_party_service
+            trust_level: untrusted
+        processes:
+          - id: P-001
+            name: InternalTools MCP Server
+            component_ref: mcp-server
+            trust_zone: server
+            technology: FastMCP / Python
+        data_stores:
+          - id: DS-001
+            name: production.db
+            type: rdbms
+            data_classification: unknown
+        data_flows:
+          - id: DF-001
+            source: A-001
+            destination: P-001
+            data_description: MCP tool invocation requests (tool name + arguments)
+            data_classification: unknown
+            protocol: HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-002
+            source: P-001
+            destination: DS-001
+            data_description: SQL queries and query results
+            data_classification: unknown
+            protocol: SQLite (local file)
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+          - id: DF-003
+            source: P-001
+            destination: A-002
+            data_description: Outbound HTTP requests via fetch_url and send_notification (webhook channel)
+            data_classification: unknown
+            protocol: HTTP
+            encryption_in_transit: unknown
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+        trust_boundaries:
+          - id: TB-001
+            name: Network Boundary
+            type: network
+            contains:
+              - P-001
+              - DS-001
+        mermaid: |
+          graph LR
+            A001([AI Agent / MCP Client\nuntrusted]) -->|HTTP, no auth, no TLS| P001[/InternalTools MCP Server\n0.0.0.0:8080/]
+            P001 -->|SQLite local| DS001[(production.db)]
+            P001 -->|HTTP outbound| A002([External HTTP Services])
+
+      - level: container
+        actors:
+          - id: A-001
+            name: AI Agent / MCP Client
+            type: system
+            trust_level: untrusted
+        processes:
+          - id: P-001
+            name: InternalTools MCP Server
+            component_ref: mcp-server
+            trust_zone: server
+            technology: FastMCP / Python
+        data_stores:
+          - id: DS-001
+            name: production.db
+            type: rdbms
+            data_classification: unknown
+        data_flows:
+          - id: DF-001
+            source: A-001
+            destination: P-001
+            data_description: MCP JSON tool call
+            data_classification: unknown
+            protocol: HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-002
+            source: P-001
+            destination: DS-001
+            data_description: SQL query execution
+            data_classification: unknown
+            protocol: SQLite file
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+        trust_boundaries:
+          - id: TB-001
+            name: Server Process Boundary
+            type: process
+            contains:
+              - P-001
+              - DS-001
+        mermaid: |
+          graph TB
+            subgraph TB001 [Server Process Boundary]
+              P001[InternalTools MCP Server\nFastMCP / Python]
+              DS001[(production.db\nSQLite)]
+            end
+            A001([AI Agent / MCP Client]) -->|HTTP :8080 no auth| P001
+            P001 -->|file open / sqlite3| DS001
+
+      - level: component
+        actors:
+          - id: A-001
+            name: MCP Client
+            type: system
+            trust_level: untrusted
+        processes:
+          - id: P-001
+            name: read_file
+            component_ref: mcp-server
+            trust_zone: server
+            technology: Python open()
+          - id: P-002
+            name: write_file
+            component_ref: mcp-server
+            trust_zone: server
+            technology: Python open()
+          - id: P-003
+            name: run_command
+            component_ref: mcp-server
+            trust_zone: server
+            technology: subprocess.run(shell=True)
+          - id: P-004
+            name: query_database
+            component_ref: mcp-server
+            trust_zone: server
+            technology: sqlite3 cursor.execute (no parameterization)
+          - id: P-005
+            name: fetch_url
+            component_ref: mcp-server
+            trust_zone: server
+            technology: requests.get
+          - id: P-006
+            name: send_notification
+            component_ref: mcp-server
+            trust_zone: server
+            technology: requests.post / os.system(sendmail)
+          - id: P-007
+            name: list_directory
+            component_ref: mcp-server
+            trust_zone: server
+            technology: subprocess.run(shell=True)
+        data_stores:
+          - id: DS-001
+            name: production.db
+            type: rdbms
+            data_classification: unknown
+          - id: DS-002
+            name: server filesystem
+            type: file_system
+            data_classification: unknown
+        data_flows:
+          - id: DF-001
+            source: A-001
+            destination: P-001
+            data_description: path argument
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-002
+            source: P-001
+            destination: DS-002
+            data_description: file read
+            data_classification: unknown
+            protocol: POSIX file I/O
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+          - id: DF-003
+            source: A-001
+            destination: P-002
+            data_description: path + content arguments
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-004
+            source: P-002
+            destination: DS-002
+            data_description: file write
+            data_classification: unknown
+            protocol: POSIX file I/O
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+          - id: DF-005
+            source: A-001
+            destination: P-003
+            data_description: command string argument
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-006
+            source: A-001
+            destination: P-004
+            data_description: sql string argument
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-007
+            source: P-004
+            destination: DS-001
+            data_description: SQL query (unparameterized)
+            data_classification: unknown
+            protocol: SQLite file
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: false
+            boundary_crossed: null
+          - id: DF-008
+            source: A-001
+            destination: P-005
+            data_description: url argument
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-009
+            source: A-001
+            destination: P-006
+            data_description: recipient + message + channel arguments
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+          - id: DF-010
+            source: A-001
+            destination: P-007
+            data_description: path argument
+            data_classification: unknown
+            protocol: MCP/HTTP
+            encryption_in_transit: none
+            authentication: none
+            crosses_trust_boundary: true
+            boundary_crossed: network
+        trust_boundaries:
+          - id: TB-001
+            name: Server Process Boundary
+            type: process
+            contains:
+              - P-001
+              - P-002
+              - P-003
+              - P-004
+              - P-005
+              - P-006
+              - P-007
+              - DS-001
+              - DS-002
+        mermaid: |
+          graph LR
+            Client([MCP Client]) -->|path| RF[read_file]
+            Client -->|path+content| WF[write_file]
+            Client -->|command| RC[run_command]
+            Client -->|sql| QD[query_database]
+            Client -->|url| FU[fetch_url]
+            Client -->|recipient+msg+channel| SN[send_notification]
+            Client -->|path| LD[list_directory]
+            RF --> FS[(Filesystem)]
+            WF --> FS
+            LD --> FS
+            QD --> DB[(production.db)]
+            RC --> OS[OS Shell]
+            LD --> OS
+            FU --> Ext([External HTTP])
+            SN --> Ext
+
+    attack_surface:
+      total_external_entry_points: 7
+      total_internal_entry_points: 0
+      unauthenticated_entry_points:
+        - component: mcp-server
+          entry_point_id: EP-001
+          path_or_name: read_file
+        - component: mcp-server
+          entry_point_id: EP-002
+          path_or_name: write_file
+        - component: mcp-server
+          entry_point_id: EP-003
+          path_or_name: run_command
+        - component: mcp-server
+          entry_point_id: EP-004
+          path_or_name: query_database
+        - component: mcp-server
+          entry_point_id: EP-005
+          path_or_name: fetch_url
+        - component: mcp-server
+          entry_point_id: EP-006
+          path_or_name: send_notification
+        - component: mcp-server
+          entry_point_id: EP-007
+          path_or_name: list_directory
+      file_upload_endpoints: []
+      admin_interfaces: []
+      debug_endpoints: []
+
+  delta_report: null

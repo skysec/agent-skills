@@ -30,15 +30,26 @@ The full YAML schema (with field documentation and allowed values) is in:
 <session_dir>/                              # e.g., vuln-research/2026-05-15T14:05:00Z/
 ├── vuln-research-report.yaml              # SINGLE SOURCE OF TRUTH — fill during pipeline
 ├── vuln-research-report.md                # rendered from YAML (do not edit directly)
-├── ingest_graph.json                      # Stage 0: trailmark graph + per-file data
+├── session-state.json                     # checkpoints + budget — session_state.py owns this
+├── ingest_graph.json                      # Stage 0: graph + per-file data + coverage ledger
+├── semgrep.sarif                          # Stage 0b bundled pre-filter output (if semgrep ran)
 ├── rejected.jsonl                         # Demoted findings (one JSON object per line)
-├── findings.sarif                         # SARIF v2.1.0 (all findings ≥ hunter_confirmed)
+├── findings.sarif                         # SARIF v2.1.0 (+ taint codeFlows) — emitted by
+│                                          #   render_report.py from the validated pass
+├── validation-plan.json                   # testable plan per attack-chained finding; a
+│                                          #   validator writes results back to close the loop
 ├── architecture-dfd.md                    # Stage 0c Mermaid DFD (depth=standard+)
 ├── attack-chains/
 │   ├── VULN-001_parser_c_stack_overflow.md
 │   └── ...
 ├── triage/
-│   ├── T0001_parser_c_stack_overflow.md
+│   ├── rounds/                            # TALLY INPUTS — written by lens subagents, read
+│   │   └── VULN-001/                      # by triage_tally.py and render_report.py. Never
+│   │       ├── 01_reachability.json       # hand-edit: the report's verification stamp is
+│   │       ├── 02_defenses.json           # recomputed from these files.
+│   │       ├── 03_impact.json
+│   │       └── 04_arbiter.json
+│   ├── T0001_parser_c_stack_overflow.md   # human-readable narratives
 │   └── ...
 └── context/
     ├── net_parser_c.context.md
@@ -48,32 +59,68 @@ The full YAML schema (with field documentation and allowed values) is in:
 > `findings.json` and `pipeline-status.json` from the previous design are superseded
 > by `vuln-research-report.yaml`, which carries both in its `findings` and `pipeline` sections.
 
----
+## Ownership: which tool writes what
 
-## session.json
+| Artifact | Written by | Model may edit? |
+|----------|-----------|-----------------|
+| `session-state.json` | `session_state.py` (init/checkpoint/cost) | Never directly |
+| `triage/rounds/**/*.json` | lens + arbiter subagents (once each) | Never after writing |
+| YAML `findings[].triage` block | `triage_tally.py` | Never |
+| YAML `verification`, `risk_counts`, recommendation scores/order | `render_report.py` | Never |
+| YAML everything else | the orchestrating model, per stage | Yes |
+| `vuln-research-report.md` | `render_report.py` | Never |
+| `findings.sarif` | `render_report.py` (same validated pass as the report) | Never |
+| `validation-plan.json` | `render_report.py` (from `attack_chain.validation` blocks) | Never |
+| `attack_chain.validation.result` | the downstream validator (DAST/fuzzer/agent) | Only the validator writes it |
+
+`render_report.py` recomputes triage tallies from `triage/rounds/` at render time and refuses
+any finding whose YAML claims don't match — so hand-editing computed fields doesn't change the
+report, it just gets the finding refused.
+
+## Round record schema (`triage/rounds/<FINDING_ID>/<seq>_<lens>.json`)
 
 ```json
 {
-  "session_id": "2026-05-05T14:05:00Z",
-  "target": "/path/to/repo",
-  "created_at": "2026-05-05T14:05:00Z",
-  "closed_at": null,
-  "config": {
-    "mode": "full",
-    "base_ref": null,
-    "head_ref": null,
-    "budget_usd": 5.0,
-    "depth": "standard",
-    "severity_threshold": "high",
-    "triage_rounds": 5,
-    "max_parallel": 8,
-    "languages": "auto",
-    "sarif_import": null,
-    "output_dir": "/path/to/session"
-  },
-  "status": "running"
+  "finding_id": "VULN-001",
+  "lens": "reachability | defenses | impact | combined | arbiter | redteam",
+  "verdict": "VALID | INVALID | UNCERTAIN",
+  "reasoning": "cites the decisive code",
+  "evidence": [{"file": "net/parser.c", "line": 42, "note": "unchecked memcpy"}],
+  "crux": "arbiter records only — one sentence",
+  "recorded_at": "ISO-8601"
 }
 ```
+
+---
+
+## session-state.json
+
+Owned entirely by `session_state.py` — created by `init`, advanced by `checkpoint`, charged
+by `cost record`. The `resume` subcommand reads it to print the first incomplete stage and
+its pending units.
+
+```json
+{
+  "created_at": "2026-05-05T14:05:00Z",
+  "updated_at": "2026-05-05T14:22:10Z",
+  "config": {"mode": "full", "depth": "standard", "budget_usd": 25.0},
+  "budget": {
+    "limit_usd": 25.0,
+    "spent_usd": 12.4,
+    "by_stage": {"ranking": 0.4, "context_generation": 2.1, "hunting": 9.9}
+  },
+  "stages": {
+    "graph_build": {"status": "completed", "units": {}},
+    "hunting": {
+      "status": "started",
+      "units": {"net/parser.c": "done", "db/queries.py": "pending"}
+    }
+  }
+}
+```
+
+`cost record` exits with code 3 when the total crosses `limit_usd` — the resumable-stop
+signal (0 = unlimited).
 
 ---
 
@@ -92,7 +139,17 @@ values in fallback mode.
   "generated_at": "2026-05-05T14:05:10Z",
   "elapsed_seconds": 12.4,
   "backend": "trailmark",
+  "graph_backend": "trailmark",
   "warning": null,
+  "sarif_source": "/path/to/session/semgrep.sarif",
+  "sarif_annotated_files": 7,
+  "coverage": {
+    "total_files": 214,
+    "analyzed_files": 187,
+    "not_analyzed_files": 27,
+    "by_top_level_dir": {"net": {"total": 40, "analyzed": 38}},
+    "skipped_dirs": {"vendor": {"reason": "vendored dependencies", "file_count": 12}}
+  },
   "summary": {
     "node_count": 1847,
     "edge_count": 4312,
@@ -131,6 +188,8 @@ values in fallback mode.
       "certain_callers": 47,
       "inferred_callers": 6,
       "blast_radius_rank": 4,
+      "sarif_errors": 1,
+      "sarif_warnings": 0,
       "surface": null,
       "influence": null,
       "reachability": null,
@@ -180,13 +239,15 @@ Array of finding objects. Fields are added progressively as findings move throug
       "entrypoint_path": "recv_request → parse_header → parse_packet"
     },
     "triage": {
-      "rounds": 5,
-      "verdicts": "VVIVV",
+      "rounds": 4,
+      "verdicts": "VVI",
+      "lenses": "R:V D:V I:I",
       "arbiter_verdict": "VALID",
-      "confidence_score": 0.83,
+      "confidence_score": 0.75,
       "low_confidence": false,
       "crux": "len is attacker-controlled, no bounds check before memcpy",
-      "triage_file": "triage/T0001_parser_c_stack_overflow.md"
+      "triage_file": "triage/T0001_parser_c_stack_overflow.md",
+      "computed_by": "triage_tally.py"
     },
     "attack_chain_file": "attack-chains/VULN-001_parser_c_stack_overflow.md",
     "variants": ["variant-def67890"],

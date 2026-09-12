@@ -1,0 +1,42 @@
+{
+  "eval_id": 2,
+  "eval_name": "ai-agent-security-posture",
+  "prompt": "Before I do a security review of the AI agent code at /Users/hecbercordova/.claude/skills/ai-security-assess-workspace/evals/files/ai-agent, run secdeepwiki to map its security posture. I care especially about: what model providers it connects to, what tools it has, whether there are any prompt injection surfaces, and how credentials are managed.",
+  "assertions": [
+    {
+      "id": "ai_agent_classified",
+      "description": "snapshot.yaml has classification.ai_agent.detected == true",
+      "type": "yaml_field_equals",
+      "path": "secdeepwiki.components[0].classification.ai_agent.detected",
+      "expected": true
+    },
+    {
+      "id": "models_referenced_populated",
+      "description": "ai_agent.models_referenced has at least one entry",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.components[0].classification.ai_agent.models_referenced",
+      "min_length": 1
+    },
+    {
+      "id": "api_key_source_recorded",
+      "description": "Each model_referenced entry has api_key_source populated (not null)",
+      "type": "yaml_all_items_have_field",
+      "path": "secdeepwiki.components[0].classification.ai_agent.models_referenced",
+      "field": "api_key_source"
+    },
+    {
+      "id": "snapshot_yaml_valid",
+      "description": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "type": "file_exists_with_key",
+      "file": "snapshot.yaml",
+      "key": "secdeepwiki"
+    },
+    {
+      "id": "open_questions_generated",
+      "description": "At least one entry in open_questions (Tier 2 unknowns)",
+      "type": "yaml_list_min_length",
+      "path": "secdeepwiki.open_questions",
+      "min_length": 1
+    }
+  ]
+}

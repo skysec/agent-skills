@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "snapshot.yaml has classification.mcp_server.detected == true",
+      "passed": false,
+      "evidence": "snapshot.yaml missing or unreadable"
+    },
+    {
+      "text": "All mcp_server tools have a non-null risk_classification",
+      "passed": false,
+      "evidence": "snapshot.yaml missing or unreadable"
+    },
+    {
+      "text": "At least one entry_point of type mcp_tool exists",
+      "passed": false,
+      "evidence": "snapshot.yaml missing or unreadable"
+    },
+    {
+      "text": "snapshot.yaml exists and has top-level secdeepwiki key",
+      "passed": false,
+      "evidence": "snapshot.yaml does not exist"
+    },
+    {
+      "text": "At least one security_observation with a non-empty observation string exists",
+      "passed": false,
+      "evidence": "snapshot.yaml missing or unreadable"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  }
+}
