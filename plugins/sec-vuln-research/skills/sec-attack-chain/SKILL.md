@@ -172,6 +172,54 @@ attack_chain:
   final_evidence_level: "root_cause_explained"  # or exploit_demonstrated if PoC is complete
 ```
 
+### Step 6 — Fill the machine-readable validation plan
+
+The prose attack chain is for a human; the `attack_chain.validation` block is the same
+information in a form a downstream validator — a DAST tool, a fuzzer, or a `sec-vuln-validate`
+agent — can execute. `render_report.py` aggregates these into `validation-plan.json` and the
+SARIF `codeFlow`, so filling it is what makes a finding testable without re-derivation.
+
+Populate from what you already established for the prose sections:
+
+```yaml
+validation:
+  method: fuzz            # dast | fuzz | script-poc | unit | manual — ROUTE BY CLASS, see below
+  interface: network      # http | network | cli | library | ipc | file
+  entry_point: {symbol: recv_request, file: net/server.c, line: 88, trust_level: untrusted_external}
+  path: [recv_request, parse_header, parse_packet]   # source → sink, from the call path
+  test_vector:
+    parameter: "len field of packet header"
+    input: "<the malformed input that triggers it>"   # NEVER a real secret value
+    encoding: raw          # raw | base64 | url | none
+    constraints: "len > 64"
+  oracle:
+    type: asan             # crash | asan | status-code | response-content | timing | side-effect | auth-state
+    success: "heap-buffer-overflow in parse_packet"
+  request_template: null    # http/network only: raw request or OpenAPI fragment; mark "(partial)" if the
+                            # static entry-point signature is incomplete — do not fake a runnable request
+  preconditions: ["network reach to listener port", "no auth"]
+  # Leave `result` at its default — the validator writes it back.
+```
+
+**Route `method` by finding class — do not emit DAST for a class DAST can't test:**
+
+| Class | method | Because |
+|-------|--------|---------|
+| injection / auth_logic, reachable over HTTP or the network | `dast` | a running endpoint can be probed |
+| memory_safety | `fuzz` | needs a harness + crash/ASan oracle, not a web probe |
+| crypto_logic | `unit` (or `manual`) | a design flaw with no runtime probe |
+| anything local-only or without a runtime surface | `script-poc` or `manual` | not remotely reachable |
+
+Set `oracle.type` to match: `asan`/`crash` for memory safety, `status-code`/`response-content`
+for web injection/auth, `auth-state` for auth bypass, `timing` for a timing side-channel.
+Only give `request_template` when `interface` is `http`/`network` AND the request shape is
+actually known from the code; otherwise leave it null (a validator will construct it).
+
+**The feedback loop:** a validator runs the plan and writes `result.status: confirmed` with an
+`evidence` path back into this block. On the next `render_report.py` pass a confirmed result
+with evidence promotes the finding to `exploit_demonstrated` — the top of the evidence ladder.
+This is the only way a finding reaches that rung; never set `exploit_demonstrated` by hand.
+
 ---
 
 ## Quality Gates
@@ -184,6 +232,10 @@ Before finalizing, verify:
 - [ ] Severity has per-dimension reasoning — no dimension is empty or "N/A"
 - [ ] If the attack requires chaining with another finding, that dependency is stated
 - [ ] PoC skeleton is marked "pseudocode only" if any function is unresolvable
+- [ ] `validation.method` matches the finding class (no DAST for memory-safety/crypto)
+- [ ] `validation.oracle` names an observable success signal, and `test_vector.input`
+      contains no real secret value
+- [ ] `validation.result` is left at its default (the validator, not this skill, fills it)
 
 ---
 

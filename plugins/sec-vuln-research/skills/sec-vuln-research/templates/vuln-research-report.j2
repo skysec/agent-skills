@@ -9,6 +9,34 @@
 
 ---
 
+## Verification
+
+**Status:** {{ (report.verification.status or 'unverified') | upper }}{% if report.verification.reason %} — {{ report.verification.reason }}{% endif %}
+
+Computed by `render_report.py` from the triage round records on disk — not asserted by the model
+that produced the findings. Findings included: {{ report.verification.findings_included }} ·
+refused: {{ report.verification.findings_refused }}.
+{% if report.verification.refused %}
+
+| Refused finding | Reason |
+|-----------------|--------|
+{% for r in report.verification.refused %}
+| {{ r.id }} | {{ r.reason }} |
+{% endfor %}
+{% endif %}
+{% if report.verification.validation_warnings %}
+
+<details><summary>Validation warnings ({{ report.verification.validation_warnings | length }})</summary>
+
+{% for w in report.verification.validation_warnings %}
+- {{ w }}
+{% endfor %}
+
+</details>
+{% endif %}
+
+---
+
 ## Executive Summary
 
 **Overall Risk:** {{ report.summary.overall_risk or '—' }}
@@ -91,6 +119,32 @@
 
 *{{ report.file_ranking.ranking_note or '' }}*
 
+### Coverage
+
+{% if report.coverage %}
+{{ report.coverage.analyzed_files }} of {{ report.coverage.total_files }} files analyzed.
+Tier C (ranked, not hunted): {{ report.coverage.tier_c_skipped or 0 }} files.
+{% if report.coverage.budget_truncated %}
+**Budget-truncated (known blind spot):** {{ report.coverage.budget_truncated | join(', ') }}
+{% endif %}
+
+| Top-level dir | Files | Analyzed |
+|---------------|-------|----------|
+{% for dir, c in report.coverage.by_top_level_dir.items() %}
+| `{{ dir }}` | {{ c.total }} | {{ c.analyzed }} |
+{% endfor %}
+
+{% if report.coverage.skipped_dirs %}
+| Skipped subtree | Reason | Files |
+|-----------------|--------|-------|
+{% for dir, s in report.coverage.skipped_dirs.items() %}
+| `{{ dir }}` | {{ s.reason }} | {{ s.file_count }} |
+{% endfor %}
+{% endif %}
+{% else %}
+*Coverage data missing — this report cannot distinguish "examined and clean" from "never looked".*
+{% endif %}
+
 ### Top-Ranked Files (Tier A)
 
 | File | Priority | Surface | Influence | Reach | Tainted | High Blast | Priv Boundary |
@@ -110,18 +164,18 @@
 
 | ID | Severity | Type | File | Function | Evidence Level | Triage | Attack Chain |
 |----|---------|------|------|---------|---------------|--------|-------------|
-{% for f in report.findings %}
+{% for f in report.findings if not f.refused and not f.duplicate_of %}
 | {{ f.id }} | {{ f.final_severity or f.hunt.severity or '—' }} | {{ f.hunt.finding_type or '—' }} | {{ f.hunt.file or '—' }} | `{{ f.hunt.function or '—' }}` | {{ f.triage.final_evidence_level or f.hunt.evidence_level or '—' }} | {{ f.triage.arbiter_verdict or '—' }} ({{ ((f.triage.confidence_score or 0) * 100) | round | int }}%) | {{ '✓' if f.attack_chain.generated else '—' }} |
 {% endfor %}
 
 ---
 
-{% for f in report.findings %}
+{% for f in report.findings if not f.refused and not f.duplicate_of %}
 ### {{ f.id }} · {{ (f.final_severity or f.hunt.severity or '—') | upper }} · {{ f.hunt.finding_type or '—' }}
 
 **File:** `{{ f.hunt.file or '—' }}:L{{ f.hunt.line_start or '?' }}–{{ f.hunt.line_end or '?' }}`
 **Function:** `{{ f.hunt.function or '—' }}()`
-**CWE:** {{ f.hunt.cwe or '—' }} · **Specialist:** {{ f.hunt.specialist or '—' }}
+**CWE:** {{ f.hunt.cwe or '—' }} · **Specialist:** {{ f.hunt.specialist or '—' }} · **Stable ID:** `{{ f.stable_id or '—' }}`
 
 **Description:** {{ f.hunt.description or '—' }}
 
@@ -148,9 +202,9 @@
 
 | Property | Value |
 |----------|-------|
-| Rounds | {{ f.triage.rounds or '—' }} |
-| Verdicts | {{ f.triage.verdicts or '—' }} → {{ f.triage.arbiter_verdict or '—' }} |
-| Confidence | {{ ((f.triage.confidence_score or 0) * 100) | round | int }}% |
+| Records | {{ f.triage.rounds or '—' }} |
+| Lenses | {{ f.triage.lenses or f.triage.verdicts or '—' }} → arbiter: {{ f.triage.arbiter_verdict or '—' }} |
+| Confidence | {{ ((f.triage.confidence_score or 0) * 100) | round | int }}% (computed by {{ f.triage.computed_by or 'nothing — unaudited' }}) |
 | Low confidence flag | {{ f.triage.low_confidence }} |
 | Evidence level | {{ f.triage.final_evidence_level or '—' }} |
 

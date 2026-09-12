@@ -147,8 +147,15 @@ priority = surface × 0.5 + influence × 0.2 + reachability × 0.3
 | B | 2.0–3.5 | 30% |
 | C | < 2.0 | 0% — skipped |
 
-SARIF boost: files with `sarif:error` annotations get `surface += 1` (capped at 5) after
-the LLM scoring step, before tier assignment.
+SARIF boost: files with `sarif_errors > 0` in `ingest_graph.json` (from the bundled semgrep
+run or an external `--sarif` file) get `surface += 1` (capped at 5) after the LLM scoring
+step, before tier assignment.
+
+After tier assignment, run the mandatory budget gate before any Stage 2 spend:
+```
+uv run {baseDir}/scripts/session_state.py estimate <session_dir> --tier-a <N> --tier-b <M>
+```
+Exit code 3 = estimate exceeds remaining budget; put the choice to the user.
 
 ---
 
@@ -331,8 +338,12 @@ confirm cross-file call paths.
 
 ### Recommendations priority matrix
 
-The `recommendations` section of the YAML report is a ranked list ordered by a composite
-score. Compute the score for each finding after Stage 7 calibration:
+**Computed by `render_report.py`, not by the model.** The formula below documents what the
+renderer does: it recomputes `priority_score` for every recommendation from the finding's
+calibrated severity, tally-computed confidence, and attacker position, then sorts and
+re-ranks. Fill only `id`, `title`, `location`, `attacker_position`, and `description`;
+scores or ordering written by hand are overwritten. Recommendations pointing at findings
+that were refused, deduplicated, or not confirmed by triage are dropped.
 
 ```
 priority_score = (severity_score × 0.50)
@@ -373,5 +384,6 @@ If no attack chain was generated (finding did not reach `root_cause_explained`),
 info-leak + memory corruption) receives the combined severity's score for both entries.
 List the pair consecutively and note the dependency in the recommendation text.
 
-**Output:** the `recommendations` list in `vuln-research-report.yaml` must be sorted by
-`priority_score` descending before the report is rendered.
+**Output:** `render_report.py` sorts the `recommendations` list by `priority_score`
+descending and rewrites the ranks at render time — the YAML ends up sorted, but by the
+renderer, not by hand.

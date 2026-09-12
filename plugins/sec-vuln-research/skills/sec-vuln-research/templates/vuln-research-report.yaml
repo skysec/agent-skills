@@ -20,21 +20,49 @@ report:
     date: null                # ISO 8601, e.g. "2026-05-15"
     session_id: null          # timestamp-based session ID, e.g. "2026-05-15T14:05:00Z"
     generated_by: "sec-vuln-research"
-    skill_version: "2.0"
+    skill_version: "2.1"
     config:
       mode: null              # full | diff
       base_ref: null          # git ref (diff mode only)
       head_ref: null          # git ref (diff mode only)
       depth: null             # quick | standard | deep
-      budget_usd: null        # float, e.g. 5.0
-      triage_rounds: null     # integer, e.g. 5
+      budget_usd: null        # float, default 25.0 (0 = unlimited) — enforced by session_state.py
+      triage_lenses: null     # integer lens count for critical/high (default 3: reachability, defenses, impact)
       severity_threshold: null  # critical | high | medium
+
+  # ----------------------------------------------------------------------------
+  # VERIFICATION  (COMPUTED by render_report.py — never fill by hand)
+  # The renderer recomputes triage tallies from disk records and stamps this
+  # block. A report whose YAML claims verification the records don't back is
+  # refused finding-by-finding, and this block says so.
+  # ----------------------------------------------------------------------------
+  verification:
+    status: null              # verified | unverified — computed, do not set
+    reason: null
+    findings_included: null
+    findings_refused: null
+    refused: []
+    validation_warnings: []
+
+  # ----------------------------------------------------------------------------
+  # COVERAGE  (populated in Stage 0/1 from ingest_graph.json `coverage` + tiers)
+  # A clean report must say what was examined, not leave it to assumption.
+  # ----------------------------------------------------------------------------
+  coverage:
+    total_files: null         # every file under the target
+    analyzed_files: null      # files in the graph (code files in supported languages)
+    tier_c_skipped: null      # files ranked but not hunted (priority < 2.0)
+    budget_truncated: []      # files that ranked >= Tier B but were cut by the budget stop
+    by_top_level_dir: {}      # dir -> {total, analyzed} from ingest_graph.json
+    skipped_dirs: {}          # dir -> {reason, file_count} (vendored, generated, ...)
 
   # ----------------------------------------------------------------------------
   # GRAPH ANALYSIS  (populated in Stage 0)
   # ----------------------------------------------------------------------------
   graph_analysis:
-    backend: null             # trailmark | fallback-heuristic
+    backend: null             # trailmark | fallback-heuristic — if fallback, say so
+                              # prominently in the summary narrative: taint and
+                              # blast-radius data were unavailable for this run
     languages_detected: []    # e.g. [C, Python, Go]
     node_count: 0
     edge_count: 0
@@ -118,6 +146,9 @@ report:
   # ----------------------------------------------------------------------------
   findings:
     - id: "VULN-001"
+      stable_id: null         # content-derived, from scripts/finding_id.py — stays
+                              # the same across scans while the code is unchanged;
+                              # ci_gate.py gates on it. Stamp during Stage 3.
 
       # Stage 3 — Hunt data
       hunt:
@@ -145,16 +176,21 @@ report:
           entrypoint_distance: null  # integer hops; 0 = IS an entry point
           entrypoint_path: null      # "recv_request → parse_header → parse_packet"
 
-      # Stage 4 — Triage (populated by sec-vuln-triage, written back here)
+      # Stage 4 — Triage. The lens subagents write round records to
+      # triage/rounds/<FINDING_ID>/; scripts/triage_tally.py COMPUTES this
+      # block from those records and writes it here. Never fill the verdict,
+      # confidence, or evidence level by hand — the renderer recomputes the
+      # tally from disk and refuses findings whose claims don't match.
       triage:
-        rounds: null          # integer
-        verdicts: null        # e.g. "VVIVV" (V=VALID, I=INVALID, U=UNCERTAIN)
-        arbiter_verdict: null # VALID | INVALID | UNCERTAIN
-        confidence_score: null  # float 0.0–1.0
-        low_confidence: false
-        crux: null            # one sentence: the key question that determined the verdict
+        rounds: null          # record count (computed)
+        verdicts: null        # one char per lens record, e.g. "VVI" (computed)
+        lenses: null          # e.g. "R:V D:V I:I" — Reachability/Defenses/Impact (computed)
+        arbiter_verdict: null # VALID | INVALID | UNCERTAIN (computed from arbiter record)
+        confidence_score: null  # float 0.0–1.0 (computed: VALID votes / total records)
+        low_confidence: false # computed: VALID with confidence < 0.6
+        crux: null            # from the arbiter record
         triage_file: null     # relative path, e.g. "triage/T0001_parser_c_stack_overflow.md"
-        final_evidence_level: null  # independently_verified | suspicion | uncertain
+        final_evidence_level: null  # independently_verified | suspicion | uncertain (computed)
 
       # Stage 5 — Variant analysis
       variants: []            # list of variant-<uuid> IDs linked to this finding
@@ -168,6 +204,37 @@ report:
         exploit_path_summary: null  # one-sentence step-by-step summary
         poc_skeleton_available: false
         final_evidence_level: null  # root_cause_explained | exploit_demonstrated
+
+        # Machine-readable validation plan — feeds validation-plan.json and the
+        # SARIF codeFlow. A downstream validator (DAST tool, fuzzer, or a
+        # sec-vuln-validate agent) consumes this and writes `result` back.
+        validation:
+          method: null        # dast | fuzz | script-poc | unit | manual
+          interface: null     # http | network | cli | library | ipc | file
+          entry_point:        # the reachable external interface (structured)
+            symbol: null
+            file: null
+            line: null
+            trust_level: null # untrusted_external | semi_trusted_external | trusted_internal
+          path: []            # ["recv_request", "parse_header", "parse_packet"] — source→sink
+          test_vector:
+            parameter: null   # which input carries the trigger, e.g. "len field of packet header"
+            input: null       # proposed triggering value/payload (NEVER a real secret)
+            encoding: null     # raw | base64 | url | none
+            constraints: null # e.g. "len > 64"
+          oracle:
+            type: null        # crash | asan | status-code | response-content | timing | side-effect | auth-state
+            success: null     # observable signal that confirms exploitation
+          request_template: null  # http/network only: raw request or OpenAPI fragment; mark partial if incomplete
+          preconditions: []   # ["network reach to :PORT", "no auth"]
+          # Written back by the validator — do not fill during discovery.
+          result:
+            status: unattempted  # confirmed | not_reproduced | inconclusive | unattempted
+            validated_by: null   # tool or agent name
+            validated_at: null   # ISO-8601
+            evidence: null       # path to log/crash/response, or short note
+          # A confirmed result with evidence promotes the finding to
+          # exploit_demonstrated on the next render_report.py pass.
 
       # Stage 7 — Final state after dedup, chaining, calibration
       chained_with: null      # VULN-NNN if this finding was chained with another
